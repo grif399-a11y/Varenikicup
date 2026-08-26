@@ -566,16 +566,29 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
     <!-- step 1 -->
     <div class="reg-step show" id="regStep1">
       <div class="field">
-        <label>Ник в Brawl Stars</label>
-        <input type="text" id="regNick" placeholder="Например: xX_Vareniki_Xx">
+        <label>Название команды</label>
+        <input type="text" id="regTeamName" maxlength="40" placeholder="Например: Vareniki Team">
       </div>
       <div class="field">
-        <label>Тег игрока (#XXXXXXX)</label>
-        <input type="text" id="regTag" placeholder="#2Y8QLR9">
+        <label>Тег капитана (#XXXXXXX)</label>
+        <input type="text" id="regTag" maxlength="15" placeholder="#2Y8QLR9">
       </div>
       <div class="field">
-        <label>Telegram username</label>
-        <input type="text" id="regTg" placeholder="@username">
+        <label>Telegram капитана</label>
+        <input type="text" id="regTg" maxlength="40" placeholder="@username">
+      </div>
+      <div class="field">
+        <label>Количество тимейтов</label>
+        <input type="number" id="regTeammatesCount" min="0" max="2" step="1" value="0" oninput="updateTeammateFields()">
+        <small style="display:block;margin-top:6px;color:var(--text-muted);">Можно выбрать только 0, 1 или 2.</small>
+      </div>
+      <div class="field">
+        <label>Тег тимейта 1</label>
+        <input type="text" id="regTeammateTag1" maxlength="15" placeholder="#XXXXXXX">
+      </div>
+      <div class="field">
+        <label>Тег тимейта 2</label>
+        <input type="text" id="regTeammateTag2" maxlength="15" placeholder="#XXXXXXX">
       </div>
       <div class="form-actions">
         <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="regNext(1)">Продолжить</button>
@@ -599,10 +612,13 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
     <!-- step 3 -->
     <div class="reg-step" id="regStep3">
       <p style="color:var(--text-muted);font-weight:600;font-size:14px;line-height:1.6;margin-bottom:18px;">Проверьте данные перед отправкой:</p>
-      <div class="app-item"><span>Ник</span><b id="rvNick">—</b></div>
-      <div class="app-item"><span>Тег</span><b id="rvTag">—</b></div>
+      <div class="app-item"><span>Команда</span><b id="rvTeamName">—</b></div>
+      <div class="app-item"><span>Тег капитана</span><b id="rvTag">—</b></div>
       <div class="app-item"><span>Telegram</span><b id="rvTg">—</b></div>
-      <div class="app-item"><span>Google</span><b id="rvGoogle">—</b></div>
+      <div class="app-item"><span>Тимейтов</span><b id="rvTeammatesCount">0</b></div>
+      <div class="app-item"><span>Тег тимейта 1</span><b id="rvTeammateTag1">—</b></div>
+      <div class="app-item"><span>Тег тимейта 2</span><b id="rvTeammateTag2">—</b></div>
+      <div class="app-item"><span>Аккаунт</span><b id="rvGoogle">—</b></div>
       <div class="form-actions">
         <button class="btn btn-ghost" onclick="regBack(3)">Назад</button>
         <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="submitReg()">Отправить заявку</button>
@@ -1065,8 +1081,14 @@ function renderApps(){
   list.style.display='block';
   items.innerHTML = registrations.slice().reverse().map(r=>`
     <div class="app-item">
-      <div><b>${escapeHtml(r.nick)}</b> <span>${escapeHtml(r.tag||'')}</span></div>
-      <span>${escapeHtml(r.tg||'')} · ${r.google ? 'Google ✓' : 'без подтверждения'}</span>
+      <div>
+        <b>${escapeHtml(r.team_name || r.nick || 'Без названия')}</b>
+        <span>${escapeHtml(r.tag||'')} ${r.teammates_count !== undefined ? '· тимейтов: '+Number(r.teammates_count||0) : ''}</span>
+      </div>
+      <span>
+        ${escapeHtml(r.teammate_tag1||'')} ${escapeHtml(r.teammate_tag2||'')} ·
+        ${escapeHtml(r.tg||'')} · ${r.google ? 'Google ✓' : 'аккаунт'}
+      </span>
     </div>`).join('');
 }
 
@@ -1252,6 +1274,21 @@ document.getElementById('announceEditor').addEventListener('blur', ()=>{
 });
 
 /* ================= REGISTER FLOW ================= */
+function updateTeammateFields(){
+  const count=Math.max(0,Math.min(2,parseInt(document.getElementById('regTeammatesCount').value,10)||0));
+  document.getElementById('regTeammatesCount').value=count;
+  const f1=document.getElementById('regTeammateTag1');
+  const f2=document.getElementById('regTeammateTag2');
+  f1.disabled=count<1;
+  f2.disabled=count<2;
+  f1.style.opacity=count<1?.55:1;
+  f2.style.opacity=count<2?.55:1;
+  if(count<1) f1.value='';
+  if(count<2) f2.value='';
+}
+function validPlayerTag(tag){
+  return /^#[A-Za-z0-9]{3,15}$/.test(tag);
+}
 function regNext(step){
   if(step===1){
     const user=getCurrentUser();
@@ -1260,16 +1297,38 @@ function regNext(step){
       openUserLogin();
       return;
     }
-    const nick = document.getElementById('regNick').value.trim();
-    const tag = document.getElementById('regTag').value.trim();
-    const tg = document.getElementById('regTg').value.trim();
-    if(!nick || !tg){ showToast('Заполните ник и Telegram'); return; }
-    if(tag && !/^#[A-Za-z0-9]{3,15}$/.test(tag)){ showToast('Тег должен выглядеть как #ABC123'); return; }
-    regData = {nick, tag, tg, google:false, userId:user.id, email:user.email||''};
-    document.getElementById('rvNick').textContent = nick;
-    document.getElementById('rvTag').textContent = tag || '—';
-    document.getElementById('rvTg').textContent = tg;
-    document.getElementById('rvGoogle').textContent = user.email ? 'Аккаунт подтверждён ✓' : '—';
+    const teamName=document.getElementById('regTeamName').value.trim();
+    const tag=document.getElementById('regTag').value.trim();
+    const tg=document.getElementById('regTg').value.trim();
+    const count=Math.max(0,Math.min(2,parseInt(document.getElementById('regTeammatesCount').value,10)||0));
+    const teammateTag1=document.getElementById('regTeammateTag1').value.trim();
+    const teammateTag2=document.getElementById('regTeammateTag2').value.trim();
+
+    if(!teamName || !tag || !tg){ showToast('Заполните название команды, тег капитана и Telegram'); return; }
+    if(!validPlayerTag(tag)){ showToast('Тег капитана должен выглядеть как #ABC123'); return; }
+    if(count>=1 && !validPlayerTag(teammateTag1)){ showToast('Введите тег первого тимейта'); return; }
+    if(count>=2 && !validPlayerTag(teammateTag2)){ showToast('Введите тег второго тимейта'); return; }
+
+    regData={
+      team_name:teamName,
+      nick:teamName,
+      tag,
+      tg,
+      teammates_count:count,
+      teammate_tag1:count>=1?teammateTag1:'',
+      teammate_tag2:count>=2?teammateTag2:'',
+      google:false,
+      userId:user.id,
+      email:user.email||''
+    };
+
+    document.getElementById('rvTeamName').textContent=teamName;
+    document.getElementById('rvTag').textContent=tag;
+    document.getElementById('rvTg').textContent=tg;
+    document.getElementById('rvTeammatesCount').textContent=count;
+    document.getElementById('rvTeammateTag1').textContent=count>=1?teammateTag1:'—';
+    document.getElementById('rvTeammateTag2').textContent=count>=2?teammateTag2:'—';
+    document.getElementById('rvGoogle').textContent=user.email ? 'Аккаунт подтверждён ✓' : '—';
   }
   if(step===2){
     if(!getCurrentUser()){ showToast('Войдите в аккаунт'); openUserLogin(); return; }
@@ -1283,6 +1342,7 @@ function setStep(n){
     document.getElementById('pg'+i).classList.toggle('done', i<=n);
   });
 }
+
 async function notifyTelegram(item){
   if(!CLOUD_ENABLED) return;
   const { data: { session } } = await db.auth.getSession();
@@ -1312,41 +1372,59 @@ async function notifyTelegram(item){
 async function submitReg(){
   const user=getCurrentUser();
   if(!user){ showToast('Сначала войдите в аккаунт'); openUserLogin(); return; }
-  if(!regData.nick || !regData.tg){ showToast('Заполните данные заявки'); setStep(1); return; }
-  const id = 'VR-' + crypto.randomUUID().slice(0,8).toUpperCase();
-  const item = {
+  if(!regData.team_name || !regData.tag || !regData.tg){ showToast('Заполните данные заявки'); setStep(1); return; }
+
+  const id='VR-' + crypto.randomUUID().slice(0,8).toUpperCase();
+  const item={
     id,
     user_id:user.id,
     email:user.email||'',
-    nick:regData.nick,
-    tag:regData.tag||null,
+    team_name:regData.team_name,
+    nick:regData.team_name,
+    tag:regData.tag,
     tg:regData.tg,
+    teammates_count:Number(regData.teammates_count)||0,
+    teammate_tag1:regData.teammate_tag1||null,
+    teammate_tag2:regData.teammate_tag2||null,
     google:false,
     ts:Date.now()
   };
+
   try{
     if(!CLOUD_ENABLED) throw new Error('Supabase не подключён');
-    const {error}=await db.from('registrations').insert(item);
+
+    let {error}=await db.from('registrations').insert(item);
+
+    // Совместимость со старой таблицей: если email ещё не добавили,
+    // повторяем вставку без email. Для новых полей всё равно нужна миграция ниже.
+    if(error && /email.*column|schema cache/i.test(error.message||'')){
+      const fallback={...item};
+      delete fallback.email;
+      ({error}=await db.from('registrations').insert(fallback));
+    }
     if(error) throw error;
 
-    // Уведомление администратору в Telegram отправляется через Supabase Edge Function.
-    // Токен Telegram-бота НИКОГДА не хранится в этом HTML.
-    try {
+    try{
       await notifyTelegram(item);
-    } catch (tgError) {
-      console.warn('Telegram notification failed:', tgError);
-      // Заявка уже сохранена в базе; Telegram — отдельный канал уведомления.
+    }catch(tgError){
+      console.warn('Telegram notification failed:',tgError);
+      showToast('Заявка сохранена, но Telegram пока не настроен');
     }
 
     registrations.unshift(item);
-    document.getElementById('successId').textContent = '#' + id;
+    document.getElementById('successId').textContent='#'+id;
     [1,2,3].forEach(i=>document.getElementById('regStep'+i).classList.remove('show'));
     document.getElementById('regSuccess').classList.add('show');
     renderApps();
-    showToast('Заявка отправлена — сообщение отправляется администратору в Telegram');
+    showToast('Заявка отправлена');
   }catch(e){
     console.error(e);
-    showToast('Не удалось отправить заявку: '+(e.message||'ошибка базы'));
+    const msg=String(e?.message||e);
+    if(/column.*(team_name|teammate_tag|teammates_count)|schema cache/i.test(msg)){
+      showToast('Нужно один раз обновить таблицу registrations в Supabase');
+    }else{
+      showToast('Не удалось отправить заявку: '+msg);
+    }
   }
 }
 
@@ -1368,12 +1446,31 @@ document.addEventListener('keydown',(e)=>{
   if(e.key==='Escape' && document.getElementById('teamModal')?.classList.contains('show')) closeTeamModal();
 });
 
+updateTeammateFields();
 loadAll();
 if(location.protocol === 'file:'){
   console.warn('Vareniki site opened as a local file. Supabase email confirmation cannot reliably return to file://. Upload the HTML to a web host for full auth/Telegram functionality.');
 }
 setInterval(refreshCloud, 10000);
 </script>
+
+
+/*
+=== ОБНОВЛЕНИЕ ТАБЛИЦЫ REGISTRATIONS ===
+Если при отправке сейчас появляется "Could not find the 'email' column",
+выполните этот блок ОДИН РАЗ в Supabase -> SQL Editor:
+
+alter table public.registrations add column if not exists email text;
+alter table public.registrations add column if not exists team_name text;
+alter table public.registrations add column if not exists teammate_tag1 text;
+alter table public.registrations add column if not exists teammate_tag2 text;
+alter table public.registrations add column if not exists teammates_count integer not null default 0;
+
+update public.registrations
+set team_name = coalesce(team_name, nick),
+    teammates_count = least(greatest(coalesce(teammates_count,0),0),2)
+where true;
+*/
 
 <!--
 SUPABASE SETUP — сделать ОДИН РАЗ в SQL Editor:
