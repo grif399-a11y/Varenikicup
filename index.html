@@ -578,8 +578,8 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
         <input type="text" id="regTg" maxlength="40" placeholder="@username">
       </div>
       <div class="field">
-        <label>Количество тимейтов</label>
-        <input type="number" id="regTeammatesCount" min="0" max="2" step="1" value="0" oninput="updateTeammateFields()">
+        <label>Тимейтов</label>
+        <input type="number" id="regTeammatesCount" min="0" max="2" step="1" value="2" oninput="updateTeammateFields()">
         <small style="display:block;margin-top:6px;color:var(--text-muted);">Можно выбрать только 0, 1 или 2.</small>
       </div>
       <div class="field">
@@ -1395,12 +1395,11 @@ async function submitReg(){
 
     let {error}=await db.from('registrations').insert(item);
 
-    // Совместимость со старой таблицей: если email ещё не добавили,
-    // повторяем вставку без email. Для новых полей всё равно нужна миграция ниже.
-    if(error && /email.*column|schema cache/i.test(error.message||'')){
-      const fallback={...item};
-      delete fallback.email;
-      ({error}=await db.from('registrations').insert(fallback));
+    // PostgREST иногда держит старый schema cache сразу после ALTER TABLE.
+    // Один повтор после короткой паузы помогает после обновления структуры.
+    if(error && /schema cache|could not find the .*column/i.test(error.message||'')){
+      await new Promise(r=>setTimeout(r,1200));
+      ({error}=await db.from('registrations').insert(item));
     }
     if(error) throw error;
 
@@ -1421,7 +1420,7 @@ async function submitReg(){
     console.error(e);
     const msg=String(e?.message||e);
     if(/column.*(team_name|teammate_tag|teammates_count)|schema cache/i.test(msg)){
-      showToast('Нужно один раз обновить таблицу registrations в Supabase');
+      showToast('Supabase ещё не обновил структуру таблицы. Выполните NOTIFY pgrst, \'reload schema\'; в SQL Editor и обновите страницу.');
     }else{
       showToast('Не удалось отправить заявку: '+msg);
     }
