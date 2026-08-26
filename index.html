@@ -553,8 +553,8 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
 <!-- ================= REGISTER ================= -->
 <main id="page-register" class="page" style="display:none;">
   <div class="section-head">
-    <div class="eyebrow">Заявка</div>
-    <h2>Регистрация на турнир</h2>
+    <div class="eyebrow" data-editable="true" data-field="regEyebrow">Заявка</div>
+    <h2 data-editable="true" data-field="regTitle">Регистрация на турнир</h2>
   </div>
 
   <div class="card reg-card" style="max-width:520px;margin:0 auto;">
@@ -566,62 +566,62 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
     <!-- step 1 -->
     <div class="reg-step show" id="regStep1">
       <div class="field">
-        <label>Название команды</label>
+        <label data-editable="true" data-field="regTeamLabel">Название команды</label>
         <input type="text" id="regTeamName" maxlength="40" placeholder="Например: Vareniki Team">
       </div>
       <div class="field">
-        <label>Тег капитана (#XXXXXXX)</label>
+        <label data-editable="true" data-field="regCaptainTagLabel">Тег капитана (#XXXXXXX)</label>
         <input type="text" id="regTag" maxlength="15" placeholder="#2Y8QLR9">
       </div>
       <div class="field">
-        <label>Telegram капитана</label>
+        <label data-editable="true" data-field="regTelegramLabel">Telegram капитана</label>
         <input type="text" id="regTg" maxlength="40" placeholder="@username">
       </div>
       <div class="field">
-        <label>Тимейтов</label>
+        <label data-editable="true" data-field="regSubstitutesLabel">Замен</label>
         <input type="number" id="regTeammatesCount" min="0" max="2" step="1" value="2" oninput="updateTeammateFields()">
-        <small style="display:block;margin-top:6px;color:var(--text-muted);">Можно выбрать только 0, 1 или 2.</small>
+        <small style="display:block;margin-top:6px;color:var(--text-muted);" data-editable="true" data-field="regSubstitutesHint">Можно выбрать только 0, 1 или 2.</small>
       </div>
       <div class="field">
-        <label>Тег тимейта 1</label>
+        <label data-editable="true" data-field="regSubstitute1Label">Тег замены 1</label>
         <input type="text" id="regTeammateTag1" maxlength="15" placeholder="#XXXXXXX">
       </div>
       <div class="field">
-        <label>Тег тимейта 2</label>
+        <label data-editable="true" data-field="regSubstitute2Label">Тег замены 2</label>
         <input type="text" id="regTeammateTag2" maxlength="15" placeholder="#XXXXXXX">
       </div>
       <div class="form-actions">
-        <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="regNext(1)">Продолжить</button>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="regNext(1)" data-editable="true" data-field="regContinueButton">Продолжить</button>
       </div>
     </div>
 
     <!-- step 2 -->
     <div class="reg-step" id="regStep2">
-      <p style="color:var(--text-muted);font-weight:600;font-size:14px;line-height:1.6;">Подтвердите личность, чтобы мы могли связаться с вами по поводу турнира.</p>
+      <p style="color:var(--text-muted);font-weight:600;font-size:14px;line-height:1.6;" data-editable="true" data-field="regAuthText">Подтвердите личность, чтобы мы могли связаться с вами по поводу турнира.</p>
       <div class="google-box">
-        <div style="font-size:14px;font-weight:700;line-height:1.5;">Аккаунт участника</div>
+        <div style="font-size:14px;font-weight:700;line-height:1.5;" data-editable="true" data-field="regAccountLabel">Аккаунт участника</div>
         <span class="google-status" id="googleStatus">Проверяем вход...</span>
-        <button class="btn btn-ghost" style="margin-top:10px;width:100%;justify-content:center;" onclick="openUserLogin()">Войти / создать аккаунт</button>
+        <button class="btn btn-ghost" style="margin-top:10px;width:100%;justify-content:center;" onclick="openUserLogin()" data-editable="true" data-field="regLoginButton">Войти / создать аккаунт</button>
       </div>
       <div class="form-actions">
-        <button class="btn btn-ghost" onclick="regBack(2)">Назад</button>
-        <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="regNext(2)">Продолжить</button>
+        <button class="btn btn-ghost" onclick="regBack(2)" data-editable="true" data-field="regBackButton">Назад</button>
+        <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="regNext(2)" data-editable="true" data-field="regContinueButton2">Продолжить</button>
       </div>
     </div>
 
     <!-- step 3 -->
     <div class="reg-step" id="regStep3">
-      <p style="color:var(--text-muted);font-weight:600;font-size:14px;line-height:1.6;margin-bottom:18px;">Проверьте данные перед отправкой:</p>
-      <div class="app-item"><span>Команда</span><b id="rvTeamName">—</b></div>
-      <div class="app-item"><span>Тег капитана</span><b id="rvTag">—</b></div>
-      <div class="app-item"><span>Telegram</span><b id="rvTg">—</b></div>
-      <div class="app-item"><span>Тимейтов</span><b id="rvTeammatesCount">0</b></div>
-      <div class="app-item"><span>Тег тимейта 1</span><b id="rvTeammateTag1">—</b></div>
-      <div class="app-item"><span>Тег тимейта 2</span><b id="rvTeammateTag2">—</b></div>
-      <div class="app-item"><span>Аккаунт</span><b id="rvGoogle">—</b></div>
+      <p style="color:var(--text-muted);font-weight:600;font-size:14px;line-height:1.6;margin-bottom:18px;" data-editable="true" data-field="regReviewText">Проверьте данные перед отправкой:</p>
+      <div class="app-item"><span data-editable="true" data-field="regReviewTeamLabel">Команда</span><b id="rvTeamName">—</b></div>
+      <div class="app-item"><span data-editable="true" data-field="regReviewCaptainLabel">Тег капитана</span><b id="rvTag">—</b></div>
+      <div class="app-item"><span data-editable="true" data-field="regReviewTelegramLabel">Telegram</span><b id="rvTg">—</b></div>
+      <div class="app-item"><span data-editable="true" data-field="regReviewSubstitutesLabel">Замен</span><b id="rvTeammatesCount">2</b></div>
+      <div class="app-item"><span data-editable="true" data-field="regReviewSubstitute1Label">Тег замены 1</span><b id="rvTeammateTag1">—</b></div>
+      <div class="app-item"><span data-editable="true" data-field="regReviewSubstitute2Label">Тег замены 2</span><b id="rvTeammateTag2">—</b></div>
+      <div class="app-item"><span data-editable="true" data-field="regReviewAccountLabel">Аккаунт</span><b id="rvGoogle">—</b></div>
       <div class="form-actions">
-        <button class="btn btn-ghost" onclick="regBack(3)">Назад</button>
-        <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="submitReg()">Отправить заявку</button>
+        <button class="btn btn-ghost" onclick="regBack(3)" data-editable="true" data-field="regBackButton2">Назад</button>
+        <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="submitReg()" data-editable="true" data-field="regSubmitButton">Отправить заявку</button>
       </div>
     </div>
 
@@ -629,7 +629,7 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
     <div class="reg-step" id="regSuccess">
       <div class="success-box">
         <div class="check">✓</div>
-        <h3>Заявка отправлена</h3>
+        <h3 data-editable="true" data-field="regSuccessTitle">Заявка отправлена</h3>
         <p>Заявка <span class="reg-id" id="successId"></span> принята. Следите за расписанием и результатами отбора в нашем Telegram-канале.</p>
         <a class="btn btn-tg" style="margin-top:18px;" href="https://t.me/varenikitournament" target="_blank" rel="noopener">
           <svg width="18" height="18" viewBox="0 0 240 240" fill="none"><circle cx="120" cy="120" r="120" fill="#3457E8"/><path d="M54 122l125-48c6-2 11 1 9 10l-21 100c-2 8-7 10-14 6l-38-28-18 17c-2 2-4 3-8 3l3-40 73-66c3-3-1-5-5-2l-90 57-39-12c-8-3-8-9 2-12z" fill="#fff"/></svg>
@@ -746,7 +746,7 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
 </div>
 
 <div class="admin-bar" id="adminBar">
-  ⚙️ Режим администратора включён — правки текста и таблицы сохраняются автоматически
+  ⚙️ Режим администратора включён — текст сайта, анкеты и таблица сохраняются автоматически. Текст с подсветкой можно менять прямо на странице.
   <button onclick="logoutAdmin()">Выйти из режима админа</button>
 </div>
 
@@ -765,7 +765,33 @@ let content = {
   footerText:"© 2026 Vareniki E-Sport Team. Турниры по Brawl Stars.",
   contactTitle:"Связаться с администрацией",
   contactText:"Вопросы по турнирам, партнёрству и сотрудничеству — пишите напрямую организатору.",
-  announcement:""
+  announcement:"",
+  regEyebrow:"Заявка",
+  regTitle:"Регистрация на турнир",
+  regTeamLabel:"Название команды",
+  regCaptainTagLabel:"Тег капитана (#XXXXXXX)",
+  regTelegramLabel:"Telegram капитана",
+  regSubstitutesLabel:"Замен",
+  regSubstitutesHint:"Можно выбрать только 0, 1 или 2.",
+  regSubstitute1Label:"Тег замены 1",
+  regSubstitute2Label:"Тег замены 2",
+  regAuthText:"Подтвердите личность, чтобы мы могли связаться с вами по поводу турнира.",
+  regAccountLabel:"Аккаунт участника",
+  regLoginButton:"Войти / создать аккаунт",
+  regContinueButton:"Продолжить",
+  regContinueButton2:"Продолжить",
+  regBackButton:"Назад",
+  regBackButton2:"Назад",
+  regReviewText:"Проверьте данные перед отправкой:",
+  regReviewTeamLabel:"Команда",
+  regReviewCaptainLabel:"Тег капитана",
+  regReviewTelegramLabel:"Telegram",
+  regReviewSubstitutesLabel:"Замен",
+  regReviewSubstitute1Label:"Тег замены 1",
+  regReviewSubstitute2Label:"Тег замены 2",
+  regReviewAccountLabel:"Аккаунт",
+  regSubmitButton:"Отправить заявку",
+  regSuccessTitle:"Заявка отправлена"
 };
 let leaderboard = [
   {id:1, name:"HATE RICO", points:5, img:'data:image/jpeg;base64,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', description:"Команда HATE RICO. Информация о составе пока не добавлена.", members:[]},
@@ -821,7 +847,7 @@ async function loadAll(){
         if(s.content) content = Object.assign(content, s.content);
         if(Array.isArray(s.leaderboard)) leaderboard = normalizeLeaderboard(s.leaderboard);
       }
-      const {data:r, error:re} = await db.from('registrations').select('id,user_id,email,nick,tag,tg,google,ts').order('ts',{ascending:false});
+      const {data:r, error:re} = await db.from('registrations').select('id,user_id,email,team_name,nick,tag,tg,google,ts,teammates_count,teammate_tag1,teammate_tag2').order('ts',{ascending:false});
       if(!re && Array.isArray(r)) registrations = r;
     }catch(e){ console.warn('Cloud load failed', e); }
   } else {
@@ -883,7 +909,7 @@ async function refreshCloud(){
       if(Array.isArray(s.leaderboard)) leaderboard = normalizeLeaderboard(s.leaderboard);
       renderAll();
     }
-    const {data:r, error:re} = await db.from('registrations').select('id,user_id,email,nick,tag,tg,google,ts').order('ts',{ascending:false});
+    const {data:r, error:re} = await db.from('registrations').select('id,user_id,email,team_name,nick,tag,tg,google,ts,teammates_count,teammate_tag1,teammate_tag2').order('ts',{ascending:false});
     if(re) console.warn('registrations read failed:', re.message);
     else if(Array.isArray(r)){
       registrations = r;
@@ -1133,6 +1159,7 @@ function updateUserUI(user){
   }
   const box=document.getElementById('registrationAuthStatus');
   const status=document.getElementById('googleStatus');
+  try{ if(user) setTimeout(tryAutoAdmin, 0); else if(isAdmin) logoutAdmin(); }catch(e){}
   if(box){
     box.style.display='block';
     box.innerHTML=user
@@ -1223,8 +1250,36 @@ if(CLOUD_ENABLED){
 }
 
 /* ================= ADMIN ================= */
+function adminRememberKey(){
+  const user=getCurrentUser();
+  return user ? 'vareniki_admin_' + user.id : null;
+}
+function rememberAdminForCurrentUser(){
+  const key=adminRememberKey();
+  if(key) localStorage.setItem(key,'1');
+}
+function isAdminRemembered(){
+  const key=adminRememberKey();
+  return !!(key && localStorage.getItem(key)==='1');
+}
+function enableAdmin(showMessage=true){
+  isAdmin = true;
+  closeLogin();
+  document.getElementById('adminLoginBtn').textContent = 'Админка · Выйти';
+  document.getElementById('adminLoginBtn').classList.add('is-admin');
+  document.getElementById('adminBar').classList.add('show');
+  renderAll();
+  if(showMessage) showToast('Режим администратора включён');
+}
+function tryAutoAdmin(){
+  if(!isAdmin && getCurrentUser() && isAdminRemembered()) enableAdmin(false);
+}
 function openLogin(){
   if(isAdmin) return;
+  if(getCurrentUser() && isAdminRemembered()){
+    enableAdmin(false);
+    return;
+  }
   document.getElementById('loginModal').classList.add('show');
   document.getElementById('loginErr').classList.remove('show');
   document.getElementById('loginPass').value = '';
@@ -1233,14 +1288,9 @@ function openLogin(){
 function closeLogin(){ document.getElementById('loginModal').classList.remove('show'); }
 function tryLogin(){
   const val = document.getElementById('loginPass').value;
-  if(val === '5252'){
-    isAdmin = true;
-    closeLogin();
-    document.getElementById('adminLoginBtn').textContent = 'Админка · Выйти';
-    document.getElementById('adminLoginBtn').classList.add('is-admin');
-    document.getElementById('adminBar').classList.add('show');
-    renderAll();
-    showToast('Режим администратора включён');
+  if(val === 'd5gqc21p'){
+    rememberAdminForCurrentUser();
+    enableAdmin(true);
   } else {
     const box = document.getElementById('loginModalBox');
     box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
@@ -1275,7 +1325,9 @@ document.getElementById('announceEditor').addEventListener('blur', ()=>{
 
 /* ================= REGISTER FLOW ================= */
 function updateTeammateFields(){
-  const count=Math.max(0,Math.min(2,parseInt(document.getElementById('regTeammatesCount').value,10)||0));
+  const raw=document.getElementById('regTeammatesCount').value;
+  const parsed=parseInt(raw,10);
+  const count=Number.isFinite(parsed) ? Math.max(0,Math.min(2,parsed)) : 2;
   document.getElementById('regTeammatesCount').value=count;
   const f1=document.getElementById('regTeammateTag1');
   const f2=document.getElementById('regTeammateTag2');
@@ -1300,7 +1352,7 @@ function regNext(step){
     const teamName=document.getElementById('regTeamName').value.trim();
     const tag=document.getElementById('regTag').value.trim();
     const tg=document.getElementById('regTg').value.trim();
-    const count=Math.max(0,Math.min(2,parseInt(document.getElementById('regTeammatesCount').value,10)||0));
+    const parsedCount=parseInt(document.getElementById('regTeammatesCount').value,10); const count=Number.isFinite(parsedCount)?Math.max(0,Math.min(2,parsedCount)):2;
     const teammateTag1=document.getElementById('regTeammateTag1').value.trim();
     const teammateTag2=document.getElementById('regTeammateTag2').value.trim();
 
