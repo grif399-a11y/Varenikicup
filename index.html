@@ -577,11 +577,19 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
         <label data-editable="true" data-field="regTelegramLabel">Telegram капитана</label>
         <input type="text" id="regTg" maxlength="40" placeholder="@username">
       </div>
-      <div class="field"><label>Сколько игроков в команде</label><select id="regPlayersCount" onchange="updateTeammateFields()"><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
-<div class="field"><label>Тег игрока 2</label><input id="regTeammateTag1" maxlength="15" placeholder="#XXXXXXX"></div>
-<div class="field"><label>Тег игрока 3</label><input id="regTeammateTag2" maxlength="15" placeholder="#XXXXXXX"></div>
-<div class="field" id="fieldP4"><label>Тег игрока 4</label><input id="regTeammateTag3" maxlength="15" placeholder="#XXXXXXX"></div>
-<div class="field" id="fieldP5"><label>Тег игрока 5</label><input id="regTeammateTag4" maxlength="15" placeholder="#XXXXXXX"></div>
+      <div class="field">
+        <label data-editable="true" data-field="regSubstitutesLabel">Замен</label>
+        <input type="number" id="regTeammatesCount" min="0" max="2" step="1" value="2" oninput="updateTeammateFields()">
+        <small style="display:block;margin-top:6px;color:var(--text-muted);" data-editable="true" data-field="regSubstitutesHint">Можно выбрать только 0, 1 или 2.</small>
+      </div>
+      <div class="field">
+        <label data-editable="true" data-field="regSubstitute1Label">Тег замены 1</label>
+        <input type="text" id="regTeammateTag1" maxlength="15" placeholder="#XXXXXXX">
+      </div>
+      <div class="field">
+        <label data-editable="true" data-field="regSubstitute2Label">Тег замены 2</label>
+        <input type="text" id="regTeammateTag2" maxlength="15" placeholder="#XXXXXXX">
+      </div>
       <div class="form-actions">
         <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="regNext(1)" data-editable="true" data-field="regContinueButton">Продолжить</button>
       </div>
@@ -607,9 +615,9 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
       <div class="app-item"><span data-editable="true" data-field="regReviewTeamLabel">Команда</span><b id="rvTeamName">—</b></div>
       <div class="app-item"><span data-editable="true" data-field="regReviewCaptainLabel">Тег капитана</span><b id="rvTag">—</b></div>
       <div class="app-item"><span data-editable="true" data-field="regReviewTelegramLabel">Telegram</span><b id="rvTg">—</b></div>
-      <div class="app-item"><span data-editable="true" data-field="regReviewSubstitutesLabel">Игроков</span><b id="rvTeammatesCount">2</b></div>
-      <div class="app-item"><span data-editable="true" data-field="regReviewSubstitute1Label">Тег игрока 2</span><b id="rvTeammateTag1">—</b></div>
-      <div class="app-item"><span data-editable="true" data-field="regReviewSubstitute2Label">Тег игрока 3</span><b id="rvTeammateTag2">—</b></div>
+      <div class="app-item"><span data-editable="true" data-field="regReviewSubstitutesLabel">Замен</span><b id="rvTeammatesCount">2</b></div>
+      <div class="app-item"><span data-editable="true" data-field="regReviewSubstitute1Label">Тег замены 1</span><b id="rvTeammateTag1">—</b></div>
+      <div class="app-item"><span data-editable="true" data-field="regReviewSubstitute2Label">Тег замены 2</span><b id="rvTeammateTag2">—</b></div>
       <div class="app-item"><span data-editable="true" data-field="regReviewAccountLabel">Аккаунт</span><b id="rvGoogle">—</b></div>
       <div class="form-actions">
         <button class="btn btn-ghost" onclick="regBack(3)" data-editable="true" data-field="regBackButton2">Назад</button>
@@ -763,10 +771,10 @@ let content = {
   regTeamLabel:"Название команды",
   regCaptainTagLabel:"Тег капитана (#XXXXXXX)",
   regTelegramLabel:"Telegram капитана",
-  regSubstitutesLabel:"Игроков",
+  regSubstitutesLabel:"Замен",
   regSubstitutesHint:"Можно выбрать только 0, 1 или 2.",
-  regSubstitute1Label:"Тег игрока 2",
-  regSubstitute2Label:"Тег игрока 3",
+  regSubstitute1Label:"Тег замены 1",
+  regSubstitute2Label:"Тег замены 2",
   regAuthText:"Подтвердите личность, чтобы мы могли связаться с вами по поводу турнира.",
   regAccountLabel:"Аккаунт участника",
   regLoginButton:"Войти / создать аккаунт",
@@ -778,9 +786,9 @@ let content = {
   regReviewTeamLabel:"Команда",
   regReviewCaptainLabel:"Тег капитана",
   regReviewTelegramLabel:"Telegram",
-  regReviewSubstitutesLabel:"Игроков",
-  regReviewSubstitute1Label:"Тег игрока 2",
-  regReviewSubstitute2Label:"Тег игрока 3",
+  regReviewSubstitutesLabel:"Замен",
+  regReviewSubstitute1Label:"Тег замены 1",
+  regReviewSubstitute2Label:"Тег замены 2",
   regReviewAccountLabel:"Аккаунт",
   regSubmitButton:"Отправить заявку",
   regSuccessTitle:"Заявка отправлена"
@@ -839,7 +847,7 @@ async function loadAll(){
         if(s.content) content = Object.assign(content, s.content);
         if(Array.isArray(s.leaderboard)) leaderboard = normalizeLeaderboard(s.leaderboard);
       }
-      const {data:r, error:re} = await db.from('registrations').select('id,user_id,email,team_name,nick,tag,tg,google,ts,players_count,teammate_tag1,teammate_tag2').order('ts',{ascending:false});
+      const {data:r, error:re} = await db.from('registrations').select('id,user_id,email,team_name,nick,tag,tg,google,ts,teammates_count,teammate_tag1,teammate_tag2').order('ts',{ascending:false});
       if(!re && Array.isArray(r)) registrations = r;
     }catch(e){ console.warn('Cloud load failed', e); }
   } else {
@@ -901,7 +909,7 @@ async function refreshCloud(){
       if(Array.isArray(s.leaderboard)) leaderboard = normalizeLeaderboard(s.leaderboard);
       renderAll();
     }
-    const {data:r, error:re} = await db.from('registrations').select('id,user_id,email,team_name,nick,tag,tg,google,ts,players_count,teammate_tag1,teammate_tag2').order('ts',{ascending:false});
+    const {data:r, error:re} = await db.from('registrations').select('id,user_id,email,team_name,nick,tag,tg,google,ts,teammates_count,teammate_tag1,teammate_tag2').order('ts',{ascending:false});
     if(re) console.warn('registrations read failed:', re.message);
     else if(Array.isArray(r)){
       registrations = r;
@@ -946,7 +954,7 @@ function renderBoard(){
       </span>
       <span class="points-wrap">
         <span class="points-label">POINTS</span>
-        <span class="points" contenteditable="${isAdmin}" data-idx="${i}" onblur="editPoints(this)" onclick="event.stopPropagation();">${Number(row.points)||3}</span>
+        <span class="points" contenteditable="${isAdmin}" data-idx="${i}" onblur="editPoints(this)" onclick="event.stopPropagation();">${Number(row.points)||0}</span>
         <button class="del" onclick="event.stopPropagation();delRow(${i})">✕</button>
       </span>`;
     div.addEventListener('click', (e)=>{
@@ -1018,7 +1026,7 @@ function openTeamModal(index,editImmediately=false){
   avatar.innerHTML=row.img?`<img src="${escapeAttr(row.img)}" alt="">`:initials;
   avatar.style.background=AVATAR_COLORS[index%AVATAR_COLORS.length];
   document.getElementById('teamModalName').textContent=row.name||'Без названия';
-  document.getElementById('teamModalPoints').textContent=`${Number(row.points)||3} POINTS`;
+  document.getElementById('teamModalPoints').textContent=`${Number(row.points)||0} POINTS`;
   document.getElementById('teamModalDescription').textContent=row.description.trim()||'Информация о команде пока не добавлена.';
 
   const members=document.getElementById('teamModalMembers');
@@ -1045,7 +1053,7 @@ function populateTeamEditor(index){
   const row=leaderboard[index];
   if(!row) return;
   document.getElementById('teamEditName').value=row.name||'';
-  document.getElementById('teamEditPoints').value=Number(row.points)||3;
+  document.getElementById('teamEditPoints').value=Number(row.points)||0;
   document.getElementById('teamEditImg').value=row.img||'';
   document.getElementById('teamEditDescription').value=row.description||'';
   const list=document.getElementById('memberEditorList');
@@ -1101,7 +1109,7 @@ function renderApps(){
     <div class="app-item">
       <div>
         <b>${escapeHtml(r.team_name || r.nick || 'Без названия')}</b>
-        <span>${escapeHtml(r.tag||'')} ${r.players_count !== undefined ? '· тимейтов: '+Number(r.players_count||3) : ''}</span>
+        <span>${escapeHtml(r.tag||'')} ${r.teammates_count !== undefined ? '· тимейтов: '+Number(r.teammates_count||0) : ''}</span>
       </div>
       <span>
         ${escapeHtml(r.teammate_tag1||'')} ${escapeHtml(r.teammate_tag2||'')} ·
@@ -1264,7 +1272,7 @@ function enableAdmin(showMessage=true){
   if(showMessage) showToast('Режим администратора включён');
 }
 function tryAutoAdmin(){
-  if(!isAdmin && getCurrentUser() && isAdminRemembered()) enableAdmin(false);
+  if(!isAdmin && getCurrentUser() && isAdminRemembered()) /* auto admin disabled */ enableAdmin(false);
 }
 function openLogin(){
   if(isAdmin) return;
@@ -1317,11 +1325,18 @@ document.getElementById('announceEditor').addEventListener('blur', ()=>{
 
 /* ================= REGISTER FLOW ================= */
 function updateTeammateFields(){
- const c=parseInt(document.getElementById("regPlayersCount").value)||3;
- document.getElementById("fieldP4").style.display=c>=4?"block":"none";
- document.getElementById("fieldP5").style.display=c>=5?"block":"none";
- if(c<4) document.getElementById("regTeammateTag3").value="";
- if(c<5) document.getElementById("regTeammateTag4").value="";
+  const raw=document.getElementById('regTeammatesCount').value;
+  const parsed=parseInt(raw,10);
+  const count=Number.isFinite(parsed) ? Math.max(0,Math.min(2,parsed)) : 2;
+  document.getElementById('regTeammatesCount').value=count;
+  const f1=document.getElementById('regTeammateTag1');
+  const f2=document.getElementById('regTeammateTag2');
+  f1.disabled=count<1;
+  f2.disabled=count<2;
+  f1.style.opacity=count<1?.55:1;
+  f2.style.opacity=count<2?.55:1;
+  if(count<1) f1.value='';
+  if(count<2) f2.value='';
 }
 function validPlayerTag(tag){
   return /^#[A-Za-z0-9]{3,15}$/.test(tag);
@@ -1337,7 +1352,7 @@ function regNext(step){
     const teamName=document.getElementById('regTeamName').value.trim();
     const tag=document.getElementById('regTag').value.trim();
     const tg=document.getElementById('regTg').value.trim();
-    const parsedCount=parseInt(document.getElementById('regPlayersCount').value,10); const count=Number.isFinite(parsedCount)?Math.max(0,Math.min(2,parsedCount)):2;
+    const parsedCount=parseInt(document.getElementById('regTeammatesCount').value,10); const count=Number.isFinite(parsedCount)?Math.max(0,Math.min(2,parsedCount)):2;
     const teammateTag1=document.getElementById('regTeammateTag1').value.trim();
     const teammateTag2=document.getElementById('regTeammateTag2').value.trim();
 
@@ -1351,11 +1366,9 @@ function regNext(step){
       nick:teamName,
       tag,
       tg,
-      players_count:count,
+      teammates_count:count,
       teammate_tag1:count>=1?teammateTag1:'',
-      teammate_tag2:teammateTag2,
-      teammate_tag3:document.getElementById('regTeammateTag3').value.trim(),
-      teammate_tag4:document.getElementById('regTeammateTag4').value.trim(),
+      teammate_tag2:count>=2?teammateTag2:'',
       google:false,
       userId:user.id,
       email:user.email||''
@@ -1422,11 +1435,9 @@ async function submitReg(){
     nick:regData.team_name,
     tag:regData.tag,
     tg:regData.tg,
-    players_count:Number(regData.players_count)||3,
+    teammates_count:Number(regData.teammates_count)||0,
     teammate_tag1:regData.teammate_tag1||null,
     teammate_tag2:regData.teammate_tag2||null,
-    teammate_tag3:regData.teammate_tag3||null,
-    teammate_tag4:regData.teammate_tag4||null,
     google:false,
     ts:Date.now()
   };
@@ -1460,7 +1471,7 @@ async function submitReg(){
   }catch(e){
     console.error(e);
     const msg=String(e?.message||e);
-    if(/column.*(team_name|teammate_tag|players_count)|schema cache/i.test(msg)){
+    if(/column.*(team_name|teammate_tag|teammates_count)|schema cache/i.test(msg)){
       showToast('Supabase ещё не обновил структуру таблицы. Выполните NOTIFY pgrst, \'reload schema\'; в SQL Editor и обновите страницу.');
     }else{
       showToast('Не удалось отправить заявку: '+msg);
@@ -1493,5 +1504,76 @@ if(location.protocol === 'file:'){
 }
 setInterval(refreshCloud, 10000);
 </script>
+
+
+
+
+<!--
+SUPABASE SETUP — сделать ОДИН РАЗ в SQL Editor:
+
+create table if not exists public.site_state (
+  id integer primary key,
+  content jsonb not null default '{}'::jsonb,
+  leaderboard jsonb not null default '[]'::jsonb,
+  updated_at timestamptz default now()
+);
+insert into public.site_state(id) values (1) on conflict (id) do nothing;
+
+create table if not exists public.registrations (
+  id text primary key,
+  user_id uuid references auth.users(id) on delete cascade,
+  email text,
+  nick text not null,
+  tag text,
+  tg text not null,
+  google boolean default false,
+  ts bigint not null
+);
+
+-- Если таблица registrations уже была создана старой версией:
+alter table public.registrations add column if not exists user_id uuid references auth.users(id) on delete cascade;
+alter table public.registrations add column if not exists email text;
+
+alter table public.site_state enable row level security;
+alter table public.registrations enable row level security;
+
+-- Рейтинг/текст: пока оставлено для текущей клиентской админки.
+create policy "public read state" on public.site_state for select using (true);
+create policy "public write state" on public.site_state for insert with check (true);
+create policy "public update state" on public.site_state for update using (true) with check (true);
+
+-- Регистрация турнира только для вошедшего пользователя.
+drop policy if exists "public insert registrations" on public.registrations;
+drop policy if exists "authenticated insert registrations" on public.registrations;
+create policy "authenticated insert registrations" on public.registrations
+  for insert to authenticated
+  with check (auth.uid() = user_id);
+
+-- Текущая админка читает заявки через браузер, поэтому чтение пока оставлено открытым.
+-- Позже сделаем отдельный Supabase admin-аккаунт и закроем этот SELECT.
+drop policy if exists "public read registrations" on public.registrations;
+create policy "authenticated read registrations" on public.registrations
+  for select to authenticated using (true);
+
+ВАЖНО:
+1. В Authentication → Providers → Email должен быть включён Email.
+2. Если хочешь, чтобы после регистрации не требовалось подтверждение e-mail, в Authentication → Providers → Email отключи Confirm email.
+3. Google-кнопку здесь специально не имитируем: настоящий Google OAuth подключается отдельно в Supabase.
+4. Не вставляйте sb_secret_... в HTML. Для сайта используется только sb_publishable_... .
+-->
+
+
+<script>
+async function sendTelegramApplication(data){
+  try{
+    await fetch('/functions/v1/send-telegram',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
+    });
+  }catch(e){console.log('TG send skipped',e);}
+}
+</script>
+
 </body>
 </html>
