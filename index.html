@@ -400,6 +400,40 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
   .row .avatar{width:36px;height:36px;font-size:13px;}
   .tg-strip{flex-direction:column;text-align:center;}
 }
+
+/* ===== VARENIKI E-SPORT UPDATE ===== */
+.board-rows.is-collapsed .row:nth-child(n+4){display:none;}
+.board-more-wrap{display:flex;justify-content:center;padding:0 14px 18px;}
+.board-more-btn{width:100%;max-width:360px;justify-content:center;background:transparent;border:1px solid var(--line);color:var(--text);padding:12px 18px;border-radius:999px;font-weight:800;font-size:13px;transition:.2s;}
+.board-more-btn:hover{border-color:var(--blue-bright);color:var(--blue-bright);transform:translateY(-1px);}
+.player-profile-modal{max-width:720px;max-height:min(90vh,820px);overflow:auto;padding:0;}
+.player-profile-cover{height:220px;background:var(--navy-card2);overflow:hidden;position:relative;border-bottom:1px solid var(--line);}
+.player-profile-cover img{width:100%;height:100%;object-fit:cover;display:block;}
+.player-profile-cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(8,11,31,.85));pointer-events:none;}
+.player-profile-body{padding:22px 26px 28px;position:relative;}
+.player-profile-head{display:flex;gap:16px;align-items:flex-end;margin-top:-62px;position:relative;z-index:2;margin-bottom:20px;}
+.player-profile-avatar{width:96px;height:96px;border-radius:24px;border:3px solid var(--navy-card);overflow:hidden;background:var(--blue-primary);display:flex;align-items:center;justify-content:center;font-family:'Anton';font-size:28px;color:#fff;flex:none;box-shadow:0 12px 28px rgba(0,0,0,.35);}
+.player-profile-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+.player-profile-name{font-family:'Anton';font-size:30px;line-height:1;text-transform:uppercase;word-break:break-word;}
+.player-profile-label{font-size:10px;color:var(--gold);font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;}
+.player-profile-bio{color:var(--text-muted);line-height:1.75;font-size:14px;white-space:pre-wrap;}
+.player-profile-admin{display:none;margin-top:22px;padding-top:18px;border-top:1px solid var(--line);}
+.admin .player-profile-admin{display:block;}
+.player-editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.player-editor-grid .field{margin-bottom:10px;}
+.player-editor-grid .field.full{grid-column:1/-1;}
+.team-member{cursor:pointer;transition:.2s;}
+.team-member:hover{border-color:var(--blue-bright);transform:translateY(-1px);}
+@media(max-width:760px){
+  .player-profile-cover{height:170px;}
+  .player-profile-body{padding:18px 16px 24px;}
+  .player-profile-head{margin-top:-48px;align-items:flex-end;}
+  .player-profile-avatar{width:78px;height:78px;border-radius:20px;font-size:22px;}
+  .player-profile-name{font-size:24px;}
+  .player-editor-grid{grid-template-columns:1fr;}
+  .player-editor-grid .field.full{grid-column:auto;}
+}
+
 </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -487,7 +521,8 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
           <div class="live"><span class="dot"></span>Обновляется вручную</div>
         </div>
         <div class="board-scallop"></div>
-        <div class="board-rows" id="boardRows"></div>
+        <div class="board-rows is-collapsed" id="boardRows"></div>
+        <div class="board-more-wrap" id="boardMoreWrap"><button class="board-more-btn" id="boardMoreBtn" onclick="toggleBoardMore()">▼ Показать ещё</button></div>
         <button class="add-row-btn" onclick="addRow()">+ Добавить команду</button>
       </div>
     </div>
@@ -578,18 +613,15 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
         <input type="text" id="regTg" maxlength="40" placeholder="@username">
       </div>
       <div class="field">
-        <label data-editable="true" data-field="regSubstitutesLabel">Замен</label>
-        <input type="number" id="regTeammatesCount" min="0" max="2" step="1" value="2" oninput="updateTeammateFields()">
-        <small style="display:block;margin-top:6px;color:var(--text-muted);" data-editable="true" data-field="regSubstitutesHint">Можно выбрать только 0, 1 или 2.</small>
+        <label>Количество игроков</label>
+        <select id="regPlayersCount" onchange="updateTeammateFields()">
+          <option value="3">3 игрока</option>
+          <option value="4">4 игрока</option>
+          <option value="5">5 игроков</option>
+        </select>
+        <small style="display:block;margin-top:6px;color:var(--text-muted);">После выбора дополнительные поля появятся автоматически.</small>
       </div>
-      <div class="field">
-        <label data-editable="true" data-field="regSubstitute1Label">Тег замены 1</label>
-        <input type="text" id="regTeammateTag1" maxlength="15" placeholder="#XXXXXXX">
-      </div>
-      <div class="field">
-        <label data-editable="true" data-field="regSubstitute2Label">Тег замены 2</label>
-        <input type="text" id="regTeammateTag2" maxlength="15" placeholder="#XXXXXXX">
-      </div>
+      <div id="dynamicPlayerFields"></div>
       <div class="form-actions">
         <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="regNext(1)" data-editable="true" data-field="regContinueButton">Продолжить</button>
       </div>
@@ -612,16 +644,14 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
     <!-- step 3 -->
     <div class="reg-step" id="regStep3">
       <p style="color:var(--text-muted);font-weight:600;font-size:14px;line-height:1.6;margin-bottom:18px;" data-editable="true" data-field="regReviewText">Проверьте данные перед отправкой:</p>
-      <div class="app-item"><span data-editable="true" data-field="regReviewTeamLabel">Команда</span><b id="rvTeamName">—</b></div>
-      <div class="app-item"><span data-editable="true" data-field="regReviewCaptainLabel">Тег капитана</span><b id="rvTag">—</b></div>
-      <div class="app-item"><span data-editable="true" data-field="regReviewTelegramLabel">Telegram</span><b id="rvTg">—</b></div>
-      <div class="app-item"><span data-editable="true" data-field="regReviewSubstitutesLabel">Замен</span><b id="rvTeammatesCount">2</b></div>
-      <div class="app-item"><span data-editable="true" data-field="regReviewSubstitute1Label">Тег замены 1</span><b id="rvTeammateTag1">—</b></div>
-      <div class="app-item"><span data-editable="true" data-field="regReviewSubstitute2Label">Тег замены 2</span><b id="rvTeammateTag2">—</b></div>
-      <div class="app-item"><span data-editable="true" data-field="regReviewAccountLabel">Аккаунт</span><b id="rvGoogle">—</b></div>
+      <div class="app-item"><span>Команда</span><b id="rvTeamName">—</b></div>
+      <div class="app-item"><span>Telegram капитана</span><b id="rvTg">—</b></div>
+      <div class="app-item"><span>Количество игроков</span><b id="rvPlayersCount">3</b></div>
+      <div id="reviewPlayers"></div>
+      <div class="app-item"><span>Аккаунт</span><b id="rvGoogle">—</b></div>
       <div class="form-actions">
         <button class="btn btn-ghost" onclick="regBack(3)" data-editable="true" data-field="regBackButton2">Назад</button>
-        <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="submitReg()" data-editable="true" data-field="regSubmitButton">Отправить заявку</button>
+        <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="submitReg()" data-editable="true" data-field="regSubmitButton">Отправить заявку в Telegram</button>
       </div>
     </div>
 
@@ -702,6 +732,33 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
       <div class="team-editor-actions">
         <button class="btn btn-primary" type="button" onclick="saveTeamDetails()">Сохранить</button>
         <button class="btn btn-ghost" type="button" onclick="toggleTeamEditor(false)">Отмена</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- player profile modal -->
+<div class="modal-overlay" id="playerModal">
+  <div class="modal player-profile-modal" id="playerModalBox">
+    <button class="modal-close" onclick="closePlayerModal()">✕</button>
+    <div class="player-profile-cover" id="playerProfileCover"></div>
+    <div class="player-profile-body">
+      <div class="player-profile-head">
+        <div class="player-profile-avatar" id="playerProfileAvatar"></div>
+        <div><div class="player-profile-label">Профиль игрока</div><div class="player-profile-name" id="playerProfileName">Игрок</div></div>
+      </div>
+      <div class="player-profile-label">О себе</div>
+      <div class="player-profile-bio" id="playerProfileBio">Описание пока не добавлено.</div>
+      <div class="player-profile-admin" id="playerProfileAdmin">
+        <div class="player-editor-grid">
+          <div class="field"><label>Ник игрока</label><input id="playerEditNick" maxlength="60"></div>
+          <div class="field"><label>Аватар игрока (URL)</label><input id="playerEditAvatar" placeholder="https://..."></div>
+          <div class="field full"><label>Большой скрин профиля (URL)</label><input id="playerEditCover" placeholder="https://..."></div>
+          <div class="field full"><label>Описание игрока</label><textarea id="playerEditBio" rows="5"></textarea></div>
+        </div>
+        <div class="team-editor-actions">
+          <button class="btn btn-primary" type="button" onclick="savePlayerProfile()">Сохранить игрока</button>
+        </div>
       </div>
     </div>
   </div>
@@ -805,6 +862,11 @@ let dragIndex = null;
 let regData = {};
 
 
+function normalizePlayer(player, index=0){
+  if(typeof player === 'string') return {nick:player, avatar:'', cover:'', bio:''};
+  if(!player || typeof player !== 'object') return {nick:'Игрок '+(index+1), avatar:'', cover:'', bio:''};
+  return {nick:String(player.nick || player.name || 'Игрок '+(index+1)), avatar:String(player.avatar || player.img || ''), cover:String(player.cover || player.screenshot || ''), bio:String(player.bio || player.description || '')};
+}
 function normalizeLeaderboard(list){
   if(!Array.isArray(list)) return [];
   return list.map((row, i)=>({
@@ -814,7 +876,7 @@ function normalizeLeaderboard(list){
     points: Number.isFinite(Number(row.points)) ? Number(row.points) : 0,
     img: row.img || '',
     description: typeof row.description === 'string' ? row.description : '',
-    members: Array.isArray(row.members) ? row.members.filter(Boolean).map(String) : []
+    members: Array.isArray(row.members) ? row.members.filter(Boolean).map((m,n)=>normalizePlayer(m,n)) : []
   }));
 }
 
@@ -838,6 +900,15 @@ function localSave(key, value){
   try{ localStorage.setItem('vareniki_' + key, JSON.stringify(value)); }catch(e){}
 }
 
+async function loadCloudRegistrations(){
+  if(!CLOUD_ENABLED) return;
+  const modernSelect='id,user_id,email,team_name,nick,tag,tg,google,ts,players_count,player_tag1,player_tag2,player_tag3,player_tag4,player_tag5,teammate_tag1,teammate_tag2';
+  const legacySelect='id,user_id,email,team_name,nick,tag,tg,google,ts,teammate_tag1,teammate_tag2';
+  let result=await db.from('registrations').select(modernSelect).order('ts',{ascending:false});
+  if(result.error){ result=await db.from('registrations').select(legacySelect).order('ts',{ascending:false}); }
+  if(!result.error && Array.isArray(result.data)) registrations=result.data;
+  else if(result.error) console.warn('registrations read failed:',result.error.message);
+}
 async function loadAll(){
   leaderboard = normalizeLeaderboard(leaderboard);
   if(CLOUD_ENABLED){
@@ -847,8 +918,7 @@ async function loadAll(){
         if(s.content) content = Object.assign(content, s.content);
         if(Array.isArray(s.leaderboard)) leaderboard = normalizeLeaderboard(s.leaderboard);
       }
-      const {data:r, error:re} = await db.from('registrations').select('id,user_id,email,team_name,nick,tag,tg,google,ts,teammates_count,teammate_tag1,teammate_tag2').order('ts',{ascending:false});
-      if(!re && Array.isArray(r)) registrations = r;
+      await loadCloudRegistrations();
     }catch(e){ console.warn('Cloud load failed', e); }
   } else {
     content = Object.assign(content, localLoad('site-content', {}));
@@ -909,12 +979,8 @@ async function refreshCloud(){
       if(Array.isArray(s.leaderboard)) leaderboard = normalizeLeaderboard(s.leaderboard);
       renderAll();
     }
-    const {data:r, error:re} = await db.from('registrations').select('id,user_id,email,team_name,nick,tag,tg,google,ts,teammates_count,teammate_tag1,teammate_tag2').order('ts',{ascending:false});
-    if(re) console.warn('registrations read failed:', re.message);
-    else if(Array.isArray(r)){
-      registrations = r;
-      if(isAdmin) renderApps();
-    }
+    await loadCloudRegistrations();
+    if(isAdmin) renderApps();
   }catch(e){ console.warn('Cloud refresh failed', e); }
 }
 
@@ -937,6 +1003,7 @@ function renderAll(){
 
 function renderBoard(){
   const wrap = document.getElementById('boardRows');
+  const wasExpanded = wrap?.classList.contains('is-expanded');
   wrap.innerHTML = '';
   leaderboard.forEach((row,i)=>{
     const div = document.createElement('div');
@@ -975,8 +1042,27 @@ function renderBoard(){
     });
     wrap.appendChild(div);
   });
+  if(wasExpanded) wrap.classList.add('is-expanded'); else wrap.classList.add('is-collapsed');
+  updateBoardMoreButton();
   const stat=document.getElementById('statTeams');
   if(stat) stat.textContent=leaderboard.length+'+';
+}
+function updateBoardMoreButton(){
+  const wrap=document.getElementById('boardRows');
+  const more=document.getElementById('boardMoreWrap');
+  const btn=document.getElementById('boardMoreBtn');
+  if(!wrap||!more||!btn) return;
+  if(leaderboard.length<=3){ more.style.display='none'; return; }
+  more.style.display='flex';
+  const expanded=wrap.classList.contains('is-expanded');
+  btn.textContent=expanded?'▲ Скрыть список':'▼ Показать ещё';
+}
+function toggleBoardMore(){
+  const wrap=document.getElementById('boardRows');
+  if(!wrap) return;
+  wrap.classList.toggle('is-expanded');
+  wrap.classList.toggle('is-collapsed');
+  updateBoardMoreButton();
 }
 function editName(el){
   if(!isAdmin) return;
@@ -1013,14 +1099,19 @@ function editAvatar(i){
 }
 
 let openedTeamIndex=null;
+let openedPlayerRef=null;
 
+function playerData(row, index){
+  row.members=Array.isArray(row.members)?row.members:[];
+  row.members[index]=normalizePlayer(row.members[index],index);
+  return row.members[index];
+}
 function openTeamModal(index,editImmediately=false){
   const row=leaderboard[index];
   if(!row) return;
   openedTeamIndex=index;
   row.description=row.description||'';
-  row.members=Array.isArray(row.members)?row.members:[];
-
+  row.members=Array.isArray(row.members)?row.members.map((m,n)=>normalizePlayer(m,n)):[];
   const avatar=document.getElementById('teamModalAvatar');
   const initials=(row.name||'?').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
   avatar.innerHTML=row.img?`<img src="${escapeAttr(row.img)}" alt="">`:initials;
@@ -1028,20 +1119,15 @@ function openTeamModal(index,editImmediately=false){
   document.getElementById('teamModalName').textContent=row.name||'Без названия';
   document.getElementById('teamModalPoints').textContent=`${Number(row.points)||0} POINTS`;
   document.getElementById('teamModalDescription').textContent=row.description.trim()||'Информация о команде пока не добавлена.';
-
   const members=document.getElementById('teamModalMembers');
   members.innerHTML=row.members.length
-    ? row.members.map((m,n)=>`<div class="team-member"><span class="num">#${n+1}</span><span class="member-name">${escapeHtml(String(m))}</span></div>`).join('')
+    ? row.members.map((m,n)=>`<div class="team-member" onclick="openPlayerModal(${index},${n})"><span class="num">#${n+1}</span><span class="member-name">${escapeHtml(m.nick)}</span></div>`).join('')
     : '<div class="team-empty">Состав пока не указан.</div>';
-
   document.getElementById('teamModal').classList.add('show');
   document.getElementById('teamEditor').classList.remove('show');
   if(editImmediately && isAdmin) toggleTeamEditor(true);
 }
-function closeTeamModal(){
-  document.getElementById('teamModal').classList.remove('show');
-  openedTeamIndex=null;
-}
+function closeTeamModal(){ document.getElementById('teamModal').classList.remove('show'); openedTeamIndex=null; }
 function toggleTeamEditor(force){
   if(!isAdmin || openedTeamIndex===null) return;
   const editor=document.getElementById('teamEditor');
@@ -1050,40 +1136,60 @@ function toggleTeamEditor(force){
   if(show) populateTeamEditor(openedTeamIndex);
 }
 function populateTeamEditor(index){
-  const row=leaderboard[index];
-  if(!row) return;
+  const row=leaderboard[index]; if(!row) return;
   document.getElementById('teamEditName').value=row.name||'';
   document.getElementById('teamEditPoints').value=Number(row.points)||0;
   document.getElementById('teamEditImg').value=row.img||'';
   document.getElementById('teamEditDescription').value=row.description||'';
-  const list=document.getElementById('memberEditorList');
-  list.innerHTML='';
-  (Array.isArray(row.members)?row.members:[]).forEach(member=>addMemberField(member));
+  const list=document.getElementById('memberEditorList'); list.innerHTML='';
+  (Array.isArray(row.members)?row.members:[]).forEach((member,n)=>addMemberField(member,n));
 }
-function addMemberField(value=''){
+function addMemberField(value='', index=null){
   const list=document.getElementById('memberEditorList');
-  const row=document.createElement('div');
-  row.className='member-editor-row';
-  row.innerHTML=`<input type="text" maxlength="60" placeholder="Имя игрока" value="${escapeAttr(value)}"><button type="button" onclick="this.parentElement.remove()" title="Удалить игрока">✕</button>`;
+  const player=normalizePlayer(value, list.children.length);
+  const row=document.createElement('div'); row.className='member-editor-row';
+  row.innerHTML=`<input type="text" maxlength="60" placeholder="Ник игрока" value="${escapeAttr(player.nick)}"><button type="button" onclick="this.parentElement.remove()" title="Удалить игрока">✕</button>`;
+  row.dataset.player=JSON.stringify(player);
   list.appendChild(row);
 }
 function saveTeamDetails(){
   if(!isAdmin || openedTeamIndex===null) return;
-  const row=leaderboard[openedTeamIndex];
-  if(!row) return;
+  const row=leaderboard[openedTeamIndex]; if(!row) return;
   row.name=document.getElementById('teamEditName').value.trim()||'Без названия';
-  row.points=parseInt(document.getElementById('teamEditPoints').value,10);
-  if(!Number.isFinite(row.points)) row.points=0;
+  row.points=parseInt(document.getElementById('teamEditPoints').value,10); if(!Number.isFinite(row.points)) row.points=0;
   row.img=document.getElementById('teamEditImg').value.trim();
   row.description=document.getElementById('teamEditDescription').value.trim();
-  row.members=Array.from(document.querySelectorAll('#memberEditorList input')).map(x=>x.value.trim()).filter(Boolean);
-  saveLeaderboard();
-  const idx=openedTeamIndex;
-  renderBoard();
-  openTeamModal(idx);
-  showToast('Данные команды сохранены');
+  row.members=Array.from(document.querySelectorAll('#memberEditorList > .member-editor-row')).map((el,n)=>{ const base=normalizePlayer(JSON.parse(el.dataset.player||'{}'),n); base.nick=el.querySelector('input').value.trim()||('Игрок '+(n+1)); return base; }).filter(x=>x.nick);
+  saveLeaderboard(); const idx=openedTeamIndex; renderBoard(); openTeamModal(idx); showToast('Данные команды сохранены');
 }
-
+function openPlayerModal(teamIndex,playerIndex){
+  const row=leaderboard[teamIndex]; if(!row||!Array.isArray(row.members)||!row.members[playerIndex]) return;
+  const player=playerData(row,playerIndex); openedPlayerRef={teamIndex,playerIndex};
+  document.getElementById('playerProfileName').textContent=player.nick||'Игрок';
+  document.getElementById('playerProfileBio').textContent=player.bio||'Описание пока не добавлено.';
+  const avatar=document.getElementById('playerProfileAvatar');
+  avatar.innerHTML=player.avatar?`<img src="${escapeAttr(player.avatar)}" alt="">`:(player.nick||'?').slice(0,2).toUpperCase();
+  const cover=document.getElementById('playerProfileCover');
+  cover.innerHTML=player.cover?`<img src="${escapeAttr(player.cover)}" alt="">`:'';
+  if(isAdmin){
+    document.getElementById('playerEditNick').value=player.nick||'';
+    document.getElementById('playerEditAvatar').value=player.avatar||'';
+    document.getElementById('playerEditCover').value=player.cover||'';
+    document.getElementById('playerEditBio').value=player.bio||'';
+  }
+  document.getElementById('playerModal').classList.add('show');
+}
+function closePlayerModal(){ document.getElementById('playerModal').classList.remove('show'); openedPlayerRef=null; }
+function savePlayerProfile(){
+  if(!isAdmin||!openedPlayerRef) return;
+  const {teamIndex,playerIndex}=openedPlayerRef; const row=leaderboard[teamIndex]; if(!row) return;
+  const player=playerData(row,playerIndex);
+  player.nick=document.getElementById('playerEditNick').value.trim()||'Игрок';
+  player.avatar=document.getElementById('playerEditAvatar').value.trim();
+  player.cover=document.getElementById('playerEditCover').value.trim();
+  player.bio=document.getElementById('playerEditBio').value.trim();
+  saveLeaderboard(); openPlayerModal(teamIndex,playerIndex); openTeamModal(teamIndex); document.getElementById('playerModal').classList.add('show'); showToast('Профиль игрока сохранён');
+}
 function escapeAttr(s){ return String(s).replace(/"/g,'&quot;'); }
 
 function renderAnnouncement(){
@@ -1100,22 +1206,23 @@ function renderAnnouncement(){
 }
 function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
 
+function getRegistrationPlayers(r){
+  if(Array.isArray(r.players)) return r.players.filter(Boolean).map(String);
+  const modern=[r.player_tag1,r.player_tag2,r.player_tag3,r.player_tag4,r.player_tag5].filter(Boolean).map(String);
+  if(modern.length) return modern;
+  if(r.players_json){ try{ const a=JSON.parse(r.players_json); if(Array.isArray(a)) return a; }catch(e){} }
+  if(r.teammate_tag1){ try{ const a=JSON.parse(r.teammate_tag1); if(Array.isArray(a)) return a.map(String); }catch(e){} }
+  return [r.tag,r.teammate_tag1,r.teammate_tag2].filter(Boolean).map(String);
+}
 function renderApps(){
   const list = document.getElementById('appsList');
   const items = document.getElementById('appsItems');
   if(!isAdmin || registrations.length===0){ list.style.display='none'; return; }
   list.style.display='block';
-  items.innerHTML = registrations.slice().reverse().map(r=>`
-    <div class="app-item">
-      <div>
-        <b>${escapeHtml(r.team_name || r.nick || 'Без названия')}</b>
-        <span>${escapeHtml(r.tag||'')} ${r.teammates_count !== undefined ? '· тимейтов: '+Number(r.teammates_count||0) : ''}</span>
-      </div>
-      <span>
-        ${escapeHtml(r.teammate_tag1||'')} ${escapeHtml(r.teammate_tag2||'')} ·
-        ${escapeHtml(r.tg||'')} · ${r.google ? 'Google ✓' : 'аккаунт'}
-      </span>
-    </div>`).join('');
+  items.innerHTML = registrations.slice().reverse().map(r=>{
+    const players=getRegistrationPlayers(r);
+    return `<div class="app-item"><div><b>${escapeHtml(r.team_name || r.nick || 'Без названия')}</b><span>${players.length} игроков · ${escapeHtml(r.tg||'')}</span></div><span>${players.map(escapeHtml).join(' · ')} · ${r.google ? 'Google ✓' : 'аккаунт'}</span></div>`;
+  }).join('');
 }
 
 /* ================= NAV ================= */
@@ -1325,161 +1432,99 @@ document.getElementById('announceEditor').addEventListener('blur', ()=>{
 
 /* ================= REGISTER FLOW ================= */
 function updateTeammateFields(){
-  const raw=document.getElementById('regTeammatesCount').value;
-  const parsed=parseInt(raw,10);
-  const count=Number.isFinite(parsed) ? Math.max(0,Math.min(2,parsed)) : 2;
-  document.getElementById('regTeammatesCount').value=count;
-  const f1=document.getElementById('regTeammateTag1');
-  const f2=document.getElementById('regTeammateTag2');
-  f1.disabled=count<1;
-  f2.disabled=count<2;
-  f1.style.opacity=count<1?.55:1;
-  f2.style.opacity=count<2?.55:1;
-  if(count<1) f1.value='';
-  if(count<2) f2.value='';
+  const select=document.getElementById('regPlayersCount');
+  const count=Math.max(3,Math.min(5,parseInt(select?.value||3,10)||3));
+  if(select) select.value=count;
+  const holder=document.getElementById('dynamicPlayerFields'); if(!holder) return;
+  const current={};
+  holder.querySelectorAll('input[data-player-index]').forEach(el=>current[el.dataset.playerIndex]=el.value);
+  holder.innerHTML='';
+  for(let i=2;i<=count;i++){
+    const field=document.createElement('div'); field.className='field';
+    field.innerHTML=`<label>Игрок ${i}</label><input type="text" id="regPlayer${i}" data-player-index="${i}" maxlength="15" placeholder="#XXXXXXX" value="${escapeAttr(current[i]||'')}">`;
+    holder.appendChild(field);
+  }
 }
-function validPlayerTag(tag){
-  return /^#[A-Za-z0-9]{3,15}$/.test(tag);
+function getRegistrationPlayersFromForm(){
+  const count=Math.max(3,Math.min(5,parseInt(document.getElementById('regPlayersCount')?.value||3,10)||3));
+  const players=[document.getElementById('regTag').value.trim()];
+  for(let i=2;i<=count;i++) players.push(document.getElementById('regPlayer'+i)?.value.trim()||'');
+  return {count,players};
 }
+function validPlayerTag(tag){ return /^#[A-Za-z0-9]{3,15}$/.test(tag); }
 function regNext(step){
   if(step===1){
     const user=getCurrentUser();
-    if(!user){
-      showToast('Сначала войдите или создайте аккаунт');
-      openUserLogin();
-      return;
-    }
+    if(!user){ showToast('Сначала войдите или создайте аккаунт'); openUserLogin(); return; }
     const teamName=document.getElementById('regTeamName').value.trim();
-    const tag=document.getElementById('regTag').value.trim();
     const tg=document.getElementById('regTg').value.trim();
-    const parsedCount=parseInt(document.getElementById('regTeammatesCount').value,10); const count=Number.isFinite(parsedCount)?Math.max(0,Math.min(2,parsedCount)):2;
-    const teammateTag1=document.getElementById('regTeammateTag1').value.trim();
-    const teammateTag2=document.getElementById('regTeammateTag2').value.trim();
-
-    if(!teamName || !tag || !tg){ showToast('Заполните название команды, тег капитана и Telegram'); return; }
-    if(!validPlayerTag(tag)){ showToast('Тег капитана должен выглядеть как #ABC123'); return; }
-    if(count>=1 && !validPlayerTag(teammateTag1)){ showToast('Введите тег первого тимейта'); return; }
-    if(count>=2 && !validPlayerTag(teammateTag2)){ showToast('Введите тег второго тимейта'); return; }
-
-    regData={
-      team_name:teamName,
-      nick:teamName,
-      tag,
-      tg,
-      teammates_count:count,
-      teammate_tag1:count>=1?teammateTag1:'',
-      teammate_tag2:count>=2?teammateTag2:'',
-      google:false,
-      userId:user.id,
-      email:user.email||''
-    };
-
+    const {count,players}=getRegistrationPlayersFromForm();
+    if(!teamName || !players[0] || !tg){ showToast('Заполните название команды, тег капитана и Telegram'); return; }
+    if(!validPlayerTag(players[0])){ showToast('Тег капитана должен выглядеть как #ABC123'); return; }
+    for(let i=1;i<players.length;i++) if(!validPlayerTag(players[i])){ showToast('Введите корректный тег игрока '+(i+1)); return; }
+    regData={team_name:teamName,nick:teamName,tag:players[0],tg,players_count:count,players,google:false,userId:user.id,email:user.email||''};
     document.getElementById('rvTeamName').textContent=teamName;
-    document.getElementById('rvTag').textContent=tag;
     document.getElementById('rvTg').textContent=tg;
-    document.getElementById('rvTeammatesCount').textContent=count;
-    document.getElementById('rvTeammateTag1').textContent=count>=1?teammateTag1:'—';
-    document.getElementById('rvTeammateTag2').textContent=count>=2?teammateTag2:'—';
+    document.getElementById('rvPlayersCount').textContent=count;
+    document.getElementById('reviewPlayers').innerHTML=players.map((p,i)=>`<div class="app-item"><span>${i===0?'Капитан':'Игрок '+(i+1)}</span><b>${escapeHtml(p)}</b></div>`).join('');
     document.getElementById('rvGoogle').textContent=user.email ? 'Аккаунт подтверждён ✓' : '—';
   }
-  if(step===2){
-    if(!getCurrentUser()){ showToast('Войдите в аккаунт'); openUserLogin(); return; }
-  }
+  if(step===2 && !getCurrentUser()){ showToast('Войдите в аккаунт'); openUserLogin(); return; }
   setStep(step+1);
 }
 function regBack(step){ setStep(step-1); }
-function setStep(n){
-  [1,2,3].forEach(i=>{
-    document.getElementById('regStep'+i).classList.toggle('show', i===n);
-    document.getElementById('pg'+i).classList.toggle('done', i<=n);
-  });
+function setStep(n){ [1,2,3].forEach(i=>{ document.getElementById('regStep'+i).classList.toggle('show',i===n); document.getElementById('pg'+i).classList.toggle('done',i<=n); }); }
+function registrationText(item){
+  return ['🥟 VARENIKI E-SPORT — ЗАЯВКА','',`Команда: ${item.team_name}`,`Количество игроков: ${item.players_count}`,`Капитан: ${item.players[0]}`,...item.players.slice(1).map((p,i)=>`Игрок ${i+2}: ${p}`),`Telegram капитана: ${item.tg}`,`E-mail: ${item.email||'—'}`,`Заявка: ${item.id}`].join('\n');
 }
-
+function openTelegramApplication(item){
+  const text=encodeURIComponent(registrationText(item));
+  window.open('https://t.me/share/url?url=&text='+text,'_blank','noopener');
+}
 async function notifyTelegram(item){
-  if(!CLOUD_ENABLED) return;
-  const { data: { session } } = await db.auth.getSession();
-  if(!session?.access_token) return;
-
-  const response = await fetch(SUPABASE_URL + '/functions/v1/telegram-notify', {
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'Authorization':'Bearer ' + session.access_token,
-      'apikey': SUPABASE_ANON_KEY
-    },
-    body: JSON.stringify({
-      id:item.id,
-      nick:item.nick,
-      tag:item.tag || '',
-      tg:item.tg,
-      email:item.email || ''
-    })
-  });
-  if(!response.ok){
-    const text = await response.text();
-    throw new Error(text || ('HTTP ' + response.status));
-  }
+  // Telegram теперь открывается у капитана с готовым текстом. Серверный бот больше не нужен.
+  return true;
 }
-
 async function submitReg(){
   const user=getCurrentUser();
   if(!user){ showToast('Сначала войдите в аккаунт'); openUserLogin(); return; }
-  if(!regData.team_name || !regData.tag || !regData.tg){ showToast('Заполните данные заявки'); setStep(1); return; }
-
+  if(!regData.team_name || !Array.isArray(regData.players)){ showToast('Заполните данные заявки'); setStep(1); return; }
   const id='VR-' + crypto.randomUUID().slice(0,8).toUpperCase();
-  const item={
-    id,
-    user_id:user.id,
-    email:user.email||'',
-    team_name:regData.team_name,
-    nick:regData.team_name,
-    tag:regData.tag,
-    tg:regData.tg,
-    teammates_count:Number(regData.teammates_count)||0,
-    teammate_tag1:regData.teammate_tag1||null,
-    teammate_tag2:regData.teammate_tag2||null,
-    google:false,
-    ts:Date.now()
-  };
-
+  const base={id,user_id:user.id,email:user.email||'',team_name:regData.team_name,nick:regData.team_name,tag:regData.tag,tg:regData.tg,google:false,ts:Date.now()};
+  const item=Object.assign({},base,{players_count:Number(regData.players_count)||3,players:regData.players.slice()});
+  let saved=false;
   try{
-    if(!CLOUD_ENABLED) throw new Error('Supabase не подключён');
-
-    let {error}=await db.from('registrations').insert(item);
-
-    // PostgREST иногда держит старый schema cache сразу после ALTER TABLE.
-    // Один повтор после короткой паузы помогает после обновления структуры.
-    if(error && /schema cache|could not find the .*column/i.test(error.message||'')){
-      await new Promise(r=>setTimeout(r,1200));
-      ({error}=await db.from('registrations').insert(item));
+    if(CLOUD_ENABLED){
+      // Новый формат, если новые колонки уже созданы.
+      const modern=Object.assign({},base,{players_count:item.players_count,player_tag1:item.players[0]||null,player_tag2:item.players[1]||null,player_tag3:item.players[2]||null,player_tag4:item.players[3]||null,player_tag5:item.players[4]||null});
+      let result=await db.from('registrations').insert(modern);
+      if(result.error && /column|schema cache|could not find/i.test(result.error.message||'')){
+        // Совместимость со старой таблицей: все игроки сохраняются в текстовых полях без players_count.
+        const legacy=Object.assign({},base,{teammate_tag1:JSON.stringify(item.players),teammate_tag2:null});
+        result=await db.from('registrations').insert(legacy);
+      }
+      if(result.error) throw result.error;
+      saved=true;
+    }else{
+      registrations.push(item); localSave('registrations',registrations); saved=true;
     }
-    if(error) throw error;
-
-    try{
-      await notifyTelegram(item);
-    }catch(tgError){
-      console.warn('Telegram notification failed:',tgError);
-      showToast('Заявка сохранена, но Telegram пока не настроен');
+    if(saved){
+      registrations.unshift(item);
+      document.getElementById('successId').textContent='#'+id;
+      [1,2,3].forEach(i=>document.getElementById('regStep'+i).classList.remove('show'));
+      document.getElementById('regSuccess').classList.add('show');
+      renderApps();
+      openTelegramApplication(item);
+      showToast('Заявка сохранена — Telegram открыт');
     }
-
-    registrations.unshift(item);
-    document.getElementById('successId').textContent='#'+id;
-    [1,2,3].forEach(i=>document.getElementById('regStep'+i).classList.remove('show'));
-    document.getElementById('regSuccess').classList.add('show');
-    renderApps();
-    showToast('Заявка отправлена');
   }catch(e){
     console.error(e);
-    const msg=String(e?.message||e);
-    if(/column.*(team_name|teammate_tag|teammates_count)|schema cache/i.test(msg)){
-      showToast('Supabase ещё не обновил структуру таблицы. Выполните NOTIFY pgrst, \'reload schema\'; в SQL Editor и обновите страницу.');
-    }else{
-      showToast('Не удалось отправить заявку: '+msg);
-    }
+    localSave('registrations',registrations.concat(item));
+    showToast('Не удалось сохранить заявку в базу. Она сохранена локально.');
   }
 }
 
-/* ================= TOAST ================= */
+/* ================= TOAST */
 let toastTimer;
 function showToast(msg){
   const t = document.getElementById('toast');
@@ -1490,14 +1535,15 @@ function showToast(msg){
 }
 
 
-document.getElementById('teamModal')?.addEventListener('click',(e)=>{
-  if(e.target.id==='teamModal') closeTeamModal();
-});
+document.getElementById('teamModal')?.addEventListener('click',(e)=>{ if(e.target.id==='teamModal') closeTeamModal(); });
+document.getElementById('playerModal')?.addEventListener('click',(e)=>{ if(e.target.id==='playerModal') closePlayerModal(); });
 document.addEventListener('keydown',(e)=>{
-  if(e.key==='Escape' && document.getElementById('teamModal')?.classList.contains('show')) closeTeamModal();
+  if(e.key==='Escape' && document.getElementById('playerModal')?.classList.contains('show')) closePlayerModal();
+  else if(e.key==='Escape' && document.getElementById('teamModal')?.classList.contains('show')) closeTeamModal();
 });
 
 updateTeammateFields();
+updateBoardMoreButton();
 loadAll();
 if(location.protocol === 'file:'){
   console.warn('Vareniki site opened as a local file. Supabase email confirmation cannot reliably return to file://. Upload the HTML to a web host for full auth/Telegram functionality.');
@@ -1508,72 +1554,8 @@ setInterval(refreshCloud, 10000);
 
 
 
-<!--
-SUPABASE SETUP — сделать ОДИН РАЗ в SQL Editor:
-
-create table if not exists public.site_state (
-  id integer primary key,
-  content jsonb not null default '{}'::jsonb,
-  leaderboard jsonb not null default '[]'::jsonb,
-  updated_at timestamptz default now()
-);
-insert into public.site_state(id) values (1) on conflict (id) do nothing;
-
-create table if not exists public.registrations (
-  id text primary key,
-  user_id uuid references auth.users(id) on delete cascade,
-  email text,
-  nick text not null,
-  tag text,
-  tg text not null,
-  google boolean default false,
-  ts bigint not null
-);
-
--- Если таблица registrations уже была создана старой версией:
-alter table public.registrations add column if not exists user_id uuid references auth.users(id) on delete cascade;
-alter table public.registrations add column if not exists email text;
-
-alter table public.site_state enable row level security;
-alter table public.registrations enable row level security;
-
--- Рейтинг/текст: пока оставлено для текущей клиентской админки.
-create policy "public read state" on public.site_state for select using (true);
-create policy "public write state" on public.site_state for insert with check (true);
-create policy "public update state" on public.site_state for update using (true) with check (true);
-
--- Регистрация турнира только для вошедшего пользователя.
-drop policy if exists "public insert registrations" on public.registrations;
-drop policy if exists "authenticated insert registrations" on public.registrations;
-create policy "authenticated insert registrations" on public.registrations
-  for insert to authenticated
-  with check (auth.uid() = user_id);
-
--- Текущая админка читает заявки через браузер, поэтому чтение пока оставлено открытым.
--- Позже сделаем отдельный Supabase admin-аккаунт и закроем этот SELECT.
-drop policy if exists "public read registrations" on public.registrations;
-create policy "authenticated read registrations" on public.registrations
-  for select to authenticated using (true);
-
-ВАЖНО:
-1. В Authentication → Providers → Email должен быть включён Email.
-2. Если хочешь, чтобы после регистрации не требовалось подтверждение e-mail, в Authentication → Providers → Email отключи Confirm email.
-3. Google-кнопку здесь специально не имитируем: настоящий Google OAuth подключается отдельно в Supabase.
-4. Не вставляйте sb_secret_... в HTML. Для сайта используется только sb_publishable_... .
--->
 
 
-<script>
-async function sendTelegramApplication(data){
-  try{
-    await fetch('/functions/v1/send-telegram',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(data)
-    });
-  }catch(e){console.log('TG send skipped',e);}
-}
-</script>
 
 </body>
 </html>
