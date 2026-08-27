@@ -1272,14 +1272,12 @@ function enableAdmin(showMessage=true){
   if(showMessage) showToast('Режим администратора включён');
 }
 function tryAutoAdmin(){
-  if(!isAdmin && getCurrentUser() && isAdminRemembered()) enableAdmin(false);
+  if(getCurrentUser() && isAdminRemembered()){
+    document.getElementById('adminLoginBtn').classList.add('is-admin');
+  }
 }
 function openLogin(){
   if(isAdmin) return;
-  if(getCurrentUser() && isAdminRemembered()){
-    enableAdmin(false);
-    return;
-  }
   document.getElementById('loginModal').classList.add('show');
   document.getElementById('loginErr').classList.remove('show');
   document.getElementById('loginPass').value = '';
@@ -1504,24 +1502,6 @@ if(location.protocol === 'file:'){
 }
 setInterval(refreshCloud, 10000);
 </script>
-
-
-/*
-=== ОБНОВЛЕНИЕ ТАБЛИЦЫ REGISTRATIONS ===
-Если при отправке сейчас появляется "Could not find the 'email' column",
-выполните этот блок ОДИН РАЗ в Supabase -> SQL Editor:
-
-alter table public.registrations add column if not exists email text;
-alter table public.registrations add column if not exists team_name text;
-alter table public.registrations add column if not exists teammate_tag1 text;
-alter table public.registrations add column if not exists teammate_tag2 text;
-alter table public.registrations add column if not exists teammates_count integer not null default 0;
-
-update public.registrations
-set team_name = coalesce(team_name, nick),
-    teammates_count = least(greatest(coalesce(teammates_count,0),0),2)
-where true;
-*/
 
 <!--
 SUPABASE SETUP — сделать ОДИН РАЗ в SQL Editor:
