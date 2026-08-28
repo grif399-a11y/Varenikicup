@@ -896,6 +896,7 @@ function normalizeLeaderboard(list){
 */
 const SUPABASE_URL = 'https://wavgpplxjdidmtidhobh.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_44TXCp9E7tqjwZVMOE--Tw_SeVgR3zy';
+const VARENIKI_STATE_ID = 2; // отдельная строка site_state для Vareniki E-Sport Team
 const CLOUD_ENABLED = !!window.supabase && SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('PASTE_');
 const db = CLOUD_ENABLED ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
@@ -940,10 +941,15 @@ async function loadAll(){
 
   if(CLOUD_ENABLED){
     try{
-      const {data:s, error} = await db.from('site_state').select('content,leaderboard').eq('id',1).maybeSingle();
+      const {data:s, error} = await db.from('site_state').select('content,leaderboard').eq('id',VARENIKI_STATE_ID).maybeSingle();
       if(!error && s){
-        if(s.content && !looksLikeOtherSiteContent(s.content)) content = Object.assign(content, s.content);
+        if(s.content && !looksLikeOtherSiteContent(s.content)) content = Object.assign({}, VARENIKI_DEFAULT_CONTENT, s.content);
         if(Array.isArray(s.leaderboard) && !looksLikeOtherSiteLeaderboard(s.leaderboard)) leaderboard = normalizeLeaderboard(s.leaderboard);
+      } else if(!error && !s){
+        // First launch on the isolated Vareniki row: seed it with the correct Vareniki text and teams.
+        content = Object.assign({}, VARENIKI_DEFAULT_CONTENT);
+        leaderboard = normalizeLeaderboard(VARENIKI_DEFAULT_TEAMS);
+        try{ await db.from('site_state').upsert({id:VARENIKI_STATE_ID, content:content, leaderboard:leaderboard, updated_at:new Date().toISOString()}); }catch(seedError){ console.warn('Vareniki state seed failed:', seedError); }
       }
       // If an old shared database still contains the other site's content, keep Vareniki defaults visible.
       if(looksLikeOtherSiteContent(content)) content = Object.assign({}, content, VARENIKI_DEFAULT_CONTENT);
@@ -969,7 +975,7 @@ async function saveCloudState(){
     return;
   }
   const {error} = await db.from('site_state').upsert({
-    id:1,
+    id:VARENIKI_STATE_ID,
     content:content,
     leaderboard:leaderboard,
     updated_at:new Date().toISOString()
@@ -1006,11 +1012,21 @@ async function saveRegistration(item){
 async function refreshCloud(){
   if(!CLOUD_ENABLED) return;
   try{
-    const {data:s,error:se} = await db.from('site_state').select('content,leaderboard').eq('id',1).maybeSingle();
+    const {data:s,error:se} = await db.from('site_state').select('content,leaderboard').eq('id',VARENIKI_STATE_ID).maybeSingle();
     if(se) console.warn('site_state read failed:', se.message);
     if(s){
-      if(s.content && typeof s.content==='object') content = Object.assign(content, s.content);
-      if(Array.isArray(s.leaderboard)) leaderboard = normalizeLeaderboard(s.leaderboard);
+      // ВАЖНО: не позволяем старому общему state/сайту King's Esports
+      // перезаписывать Vareniki при периодическом обновлении.
+      const foreignContent = looksLikeOtherSiteContent(s.content);
+      const foreignBoard = looksLikeOtherSiteLeaderboard(s.leaderboard);
+      if(s.content && typeof s.content==='object' && !foreignContent){
+        content = Object.assign({}, VARENIKI_DEFAULT_CONTENT, s.content);
+      }
+      if(Array.isArray(s.leaderboard) && !foreignBoard){
+        leaderboard = normalizeLeaderboard(s.leaderboard);
+      }
+      if(looksLikeOtherSiteContent(content)) content = Object.assign({}, VARENIKI_DEFAULT_CONTENT);
+      if(looksLikeOtherSiteLeaderboard(leaderboard)) leaderboard = normalizeLeaderboard(VARENIKI_DEFAULT_TEAMS);
       renderAll();
     }
     const {data:r, error:re} = await db.from('registrations').select('id,user_id,email,nick,tag,tg,google,ts').order('ts',{ascending:false});
