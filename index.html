@@ -129,6 +129,27 @@ header{
 .hero{padding:64px 0 0;position:relative;}
 .hero-inner{max-width:var(--maxw);margin:0 auto;padding:0 20px;text-align:center;}
 .hero-logo{width:132px;height:132px;border-radius:50%;box-shadow:0 0 0 3px var(--blue-primary),0 0 50px rgba(52,87,232,0.45);margin-bottom:22px;}
+/* VARENIKI COIN LOGO ANIMATION */
+.hero-logo{
+  transform-style:preserve-3d;
+  backface-visibility:visible;
+  will-change:transform;
+  cursor:pointer;
+}
+.hero-logo.coin-spin{
+  animation: varenikiCoinSpin 1.35s cubic-bezier(.18,.82,.24,1) both;
+}
+@keyframes varenikiCoinSpin{
+  0%{transform:perspective(900px) rotateY(0deg) scale(1);}
+  18%{transform:perspective(900px) rotateY(32deg) scale(1.015);}
+  52%{transform:perspective(900px) rotateY(250deg) scale(1.035);}
+  76%{transform:perspective(900px) rotateY(330deg) scale(1.015);}
+  100%{transform:perspective(900px) rotateY(360deg) scale(1);}
+}
+@media (prefers-reduced-motion:reduce){
+  .hero-logo.coin-spin{animation:none;}
+}
+
 .eyebrow{font-weight:800;font-size:12px;letter-spacing:.28em;color:var(--gold);text-transform:uppercase;margin-bottom:14px;}
 .hero h1{font-size:clamp(34px,7vw,64px);line-height:1.02;}
 .hero h1 .accent{color:var(--blue-bright);}
@@ -792,7 +813,7 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
       <button class="btn btn-ghost" style="width:100%;justify-content:center;" onclick="userSignup()">Зарегистрироваться</button>
     </div>
     <div class="err" id="userLoginErr"></div>
-    <button type="button" class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px;" onclick="resendConfirmation()">Повторно отправить письмо подтверждения</button>
+    <button type="button" class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px;" onclick="resendConfirmation()">📩 Повторно отправить письмо подтверждения</button>
   </div>
 </div>
 
@@ -897,6 +918,8 @@ function normalizeLeaderboard(list){
 const SUPABASE_URL = 'https://wavgpplxjdidmtidhobh.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_44TXCp9E7tqjwZVMOE--Tw_SeVgR3zy';
 const VARENIKI_STATE_ID = 2; // отдельная строка site_state для Vareniki E-Sport Team
+// Email delivery: configure Resend as Custom SMTP in Supabase Auth settings.
+// NEVER put a Resend API key in this HTML. Supabase stores the SMTP credentials server-side.
 const CLOUD_ENABLED = !!window.supabase && SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('PASTE_');
 const db = CLOUD_ENABLED ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
@@ -1397,9 +1420,13 @@ async function resendConfirmation(){
   if(!CLOUD_ENABLED){ authError('Supabase не подключён.'); return; }
   const email=document.getElementById('userEmail').value.trim().toLowerCase();
   if(!email){ authError('Сначала введите e-mail.'); return; }
-  const {error}=await db.auth.resend({type:'signup', email});
+  const options = {};
+  if(location.protocol === 'http:' || location.protocol === 'https:'){
+    options.emailRedirectTo = location.origin + location.pathname;
+  }
+  const {error}=await db.auth.resend({type:'signup', email, options});
   if(error){ authError(friendlyAuthError(error)); return; }
-  authError('Письмо подтверждения отправлено повторно. Проверьте «Спам».');
+  authError('Письмо подтверждения отправлено. Проверьте входящие и папку «Спам».');
 }
 
 if(CLOUD_ENABLED){
@@ -1621,6 +1648,18 @@ document.addEventListener('keydown',(e)=>{
 });
 
 updatePlayerFields();
+
+// Logo: coin-like 360° spin on first load and when clicked.
+function playLogoCoinSpin(){
+  const logo=document.querySelector('.hero-logo');
+  if(!logo) return;
+  logo.classList.remove('coin-spin');
+  void logo.offsetWidth;
+  logo.classList.add('coin-spin');
+}
+setTimeout(playLogoCoinSpin, 700);
+document.querySelector('.hero-logo')?.addEventListener('click', playLogoCoinSpin);
+
 loadAll();
 if(location.protocol === 'file:'){
   console.warn('Vareniki site opened as a local file. Supabase email confirmation cannot reliably return to file://. Upload the HTML to a web host for full auth/Telegram functionality.');
