@@ -1038,7 +1038,7 @@ async function loadAll(){
         if(s.content) content = Object.assign(content, s.content);
         if(Array.isArray(s.leaderboard)) leaderboard = normalizeLeaderboard(s.leaderboard);
       }
-      const {data:r, error:re} = await db.from('registrations').select('id,email,nick,tag,tg,google,ts,team_name,teammates_count,teammate_tag,teammate_tag2,players_count,teammate_tag3,teammate_tag4').order('ts',{ascending:false});
+      const {data:r, error:re} = await db.from('registrations').select('id,email,nick,tag,tg,google,ts,team_name,players_count,teammate_tag1,teammate_tag2,teammate_tag3,teammate_tag4').order('ts',{ascending:false});
       if(!re && Array.isArray(r)) registrations = r;
     }catch(e){ console.warn('Cloud load failed', e); }
   } else {
@@ -1100,7 +1100,7 @@ async function refreshCloud(){
       if(Array.isArray(s.leaderboard)) leaderboard = normalizeLeaderboard(s.leaderboard);
       renderAll();
     }
-    const {data:r, error:re} = await db.from('registrations').select('id,email,nick,tag,tg,google,ts,team_name,teammates_count,teammate_tag,teammate_tag2,players_count,teammate_tag3,teammate_tag4').order('ts',{ascending:false});
+    const {data:r, error:re} = await db.from('registrations').select('id,email,nick,tag,tg,google,ts,team_name,players_count,teammate_tag1,teammate_tag2,teammate_tag3,teammate_tag4').order('ts',{ascending:false});
     if(re) console.warn('registrations read failed:', re.message);
     else if(Array.isArray(r)){
       registrations = r;
@@ -1407,16 +1407,46 @@ function renderParticipants(){
     </article>`).join('') : '<div class="empty-state"><div class="icon">👥</div><h3>Пока нет подтверждённых участников</h3><p>После проверки заявок администрацией команды появятся здесь.</p></div>';
 }
 async function approveApplication(id){
-  if(!isAdmin)return;
-  const apps=ensureApplications(); const a=apps.find(x=>x.id===id); if(!a)return;
+  if(!isAdmin){ showToast('Сначала войдите в админку'); return; }
+  const apps=ensureApplications();
+  const a=apps.find(x=>String(x.id)===String(id));
+  if(!a){ showToast('Заявка не найдена'); return; }
+  const oldStatus=a.status, oldApproved=a.approved_at;
   a.status='approved'; a.approved_at=Date.now();
-  await saveContent(); renderApplicationsAdmin(); renderParticipants(); showToast('Заявка подтверждена и опубликована');
+  try{
+    await saveCloudState();
+    if(CLOUD_ENABLED){
+      const {error}=await db.from('registrations').update({status:'approved',approved_at:a.approved_at}).eq('id',a.id);
+      if(error) console.warn('registration status update:',error.message);
+    }
+    renderApplicationsAdmin(); renderParticipants(); renderApps();
+    showToast('Заявка подтверждена и опубликована');
+  }catch(e){
+    a.status=oldStatus; a.approved_at=oldApproved;
+    console.error('approveApplication:',e);
+    showToast('Не удалось подтвердить: '+String(e?.message||e));
+  }
 }
 async function deleteApplication(id){
-  if(!isAdmin)return;
+  if(!isAdmin){ showToast('Сначала войдите в админку'); return; }
   if(!confirm('Удалить заявку? Она исчезнет из списка заявок и участников.'))return;
-  content.tournaments.applications=ensureApplications().filter(x=>x.id!==id);
-  await saveContent(); renderApplicationsAdmin(); renderParticipants(); showToast('Заявка удалена');
+  const apps=ensureApplications(), previous=apps.slice();
+  const target=apps.find(x=>String(x.id)===String(id));
+  if(!target){ showToast('Заявка не найдена'); return; }
+  content.tournaments.applications=apps.filter(x=>String(x.id)!==String(id));
+  try{
+    await saveCloudState();
+    if(CLOUD_ENABLED){
+      const {error}=await db.from('registrations').delete().eq('id',id);
+      if(error) console.warn('registration delete:',error.message);
+    }
+    renderApplicationsAdmin(); renderParticipants(); renderApps();
+    showToast('Заявка удалена');
+  }catch(e){
+    content.tournaments.applications=previous;
+    console.error('deleteApplication:',e);
+    showToast('Не удалось удалить: '+String(e?.message||e));
+  }
 }
 function renderApplicationsAdmin(){
   const box=document.getElementById('applicationsAdminOnly'); if(!box)return;
@@ -1479,33 +1509,53 @@ function goContact(){
 function getCurrentUser(){ return null; }
 const ADMIN_PASSWORD = 'd5gqc21p';
 function adminRememberKey(){ return 'vareniki_admin_session'; }
-function rememberAdminForCurrentUser(){ localStorage.setItem(adminRememberKey(),'1'); }
-function isAdminRemembered(){ return localStorage.getItem(adminRememberKey())==='1'; }
-function tryAutoAdmin(){ /* вход в админку только по кнопке */ }
+function rememberAdminForCurrentUser(){ try{ localStorage.setItem(adminRememberKey(),'1'); }catch(e){} }
+function isAdminRemembered(){ try{ return localStorage.getItem(adminRememberKey())==='1'; }catch(e){ return false; } }
+function tryAutoAdmin(){ /* админка включается только после правильного пароля */ }
 function openLogin(){
   if(isAdmin) return;
-  if(getCurrentUser() && isAdminRemembered()){
-    // Доступ подтверждён, но режим редактирования включаем только после явного нажатия.
-  }
-  document.getElementById('loginModal').classList.add('show');
-  document.getElementById('loginErr').classList.remove('show');
-  document.getElementById('loginPass').value = '';
-  setTimeout(()=>document.getElementById('loginPass').focus(), 50);
+  const modal=document.getElementById('loginModal');
+  const pass=document.getElementById('loginPass');
+  const err=document.getElementById('loginErr');
+  if(!modal || !pass) return;
+  modal.classList.add('show');
+  if(err) err.classList.remove('show');
+  pass.value = '';
+  setTimeout(()=>{ try{ pass.focus(); }catch(e){} }, 50);
 }
 function closeLogin(){ document.getElementById('loginModal').classList.remove('show'); }
 function tryLogin(){
-  const val = document.getElementById('loginPass').value;
-  if(val === ADMIN_PASSWORD){
+  const input=document.getElementById('loginPass');
+  const err=document.getElementById('loginErr');
+  const box=document.getElementById('loginModalBox');
+  const val=String(input?.value || '').trim();
+
+  if(val === String(ADMIN_PASSWORD)){
+    isAdmin=true;
     rememberAdminForCurrentUser();
-    enableAdmin(true);
     closeLogin();
-    goPage('applications');
-  } else {
-    const box = document.getElementById('loginModalBox');
-    box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
-    document.getElementById('loginErr').classList.add('show');
+
+    const btn=document.getElementById('adminLoginBtn');
+    const bar=document.getElementById('adminBar');
+    if(btn){
+      btn.textContent='Админка · Выйти';
+      btn.classList.add('is-admin');
+    }
+    if(bar) bar.classList.add('show');
+
+    try{ renderAll(); }catch(e){ console.error('renderAll after admin login:',e); }
+    try{ goPage('applications'); }catch(e){ console.error('goPage:',e); }
+    try{ showToast('Режим администратора включён'); }catch(e){}
+    return;
   }
-}
+
+  if(box){
+    box.classList.remove('shake');
+    void box.offsetWidth;
+    box.classList.add('shake');
+  }
+  if(err) err.classList.add('show');
+} 
 function logoutAdmin(){
   isAdmin = false;
   document.getElementById('adminLoginBtn').textContent = 'Админка';
@@ -1629,7 +1679,7 @@ async function submitReg(){
   try{
     if(!CLOUD_ENABLED) throw new Error('Supabase не подключён');
     // Храним расширенную заявку внутри nick, поэтому старую таблицу registrations менять не нужно.
-    const dbItem={id:item.id,email:item.email,nick:JSON.stringify({team_name:item.team_name,players_count:item.players_count,players:item.players,tournament_id:item.tournament_id||'',tournament_name:item.tournament_name||''}),tag:item.tag,tg:item.tg,google:false,ts:item.ts,team_name:item.team_name,teammates_count:Math.max(0,Number(item.players_count)-3),teammate_tag1:item.players[1]?.nick||null,teammate_tag2:item.players[2]?.nick||null,players_count:Number(item.players_count),teammate_tag3:item.players[3]?.nick||null,teammate_tag4:item.players[4]?.nick||null};
+    const dbItem={id:item.id,email:item.email,nick:JSON.stringify({team_name:item.team_name,players_count:item.players_count,players:item.players,tournament_id:item.tournament_id||'',tournament_name:item.tournament_name||''}),tag:item.tag,tg:item.tg,google:false,ts:item.ts,team_name:item.team_name,teammate_tag1:item.players[1]?.nick||null,teammate_tag2:item.players[2]?.nick||null,players_count:Number(item.players_count),teammate_tag3:item.players[3]?.nick||null,teammate_tag4:item.players[4]?.nick||null};
     let {error}=await db.from('registrations').insert(dbItem);
     if(error) throw error;
     ensureApplications();
@@ -1647,7 +1697,6 @@ async function submitReg(){
     await saveContent();
     registrations.unshift({...item,nick:item.team_name});
     document.getElementById('successId').textContent='#'+id;
-    document.getElementById('telegramApplicationBtn').href=buildTelegramApplicationUrl(item);
     [1,2,3].forEach(i=>document.getElementById('regStep'+i).classList.remove('show'));
     document.getElementById('regSuccess').classList.add('show');
     renderApps();
@@ -1660,6 +1709,13 @@ async function submitReg(){
 
 /* ================= TOAST ================= */
 let toastTimer;
+function setTelegramApplicationLink(item){
+  const el=document.getElementById('telegramApplicationBtn');
+  if(el && typeof buildTelegramApplicationUrl==='function'){
+    try{ el.href=buildTelegramApplicationUrl(item); }catch(e){ console.warn('Telegram link:',e); }
+  }
+}
+
 function showToast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -1800,5 +1856,15 @@ setInterval(refreshCloud, 10000);
 
 
 
+<script id="admin-login-hardfix">
+(function(){
+  const pass=document.getElementById('loginPass');
+  if(pass){
+    pass.addEventListener('keydown',function(e){
+      if(e.key==='Enter'){ e.preventDefault(); tryLogin(); }
+    });
+  }
+})();
+</script>
 </body>
 </html>
