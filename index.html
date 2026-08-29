@@ -789,10 +789,22 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
     </div>
     <div class="form-actions" style="flex-direction:column;">
       <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="userLogin()">Войти</button>
-      <button class="btn btn-ghost" style="width:100%;justify-content:center;" onclick="userSignup()">Зарегистрироваться</button>
+      <button class="btn btn-ghost" style="width:100%;justify-content:center;" onclick="userSignup()">Зарегистрироваться по e-mail</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--text-muted);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;">
+      <span style="height:1px;background:var(--line);flex:1"></span><span>или</span><span style="height:1px;background:var(--line);flex:1"></span>
+    </div>
+    <div style="display:grid;gap:10px;">
+      <button class="btn btn-ghost" style="width:100%;justify-content:center;" onclick="oauthLogin('google')">
+        <span style="font-weight:900;font-size:17px;line-height:1;">G</span> Войти через Google
+      </button>
+      <button class="btn btn-ghost" style="width:100%;justify-content:center;" onclick="oauthLogin('apple')">
+        <span style="font-size:18px;line-height:1;"></span> Войти через Apple
+      </button>
     </div>
     <div class="err" id="userLoginErr"></div>
     <button type="button" class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px;" onclick="resendConfirmation()">Повторно отправить письмо подтверждения</button>
+    <div style="margin-top:12px;color:var(--text-muted);font-size:12px;line-height:1.5;text-align:center;">Google и Apple требуют одноразовой настройки провайдеров в Supabase. После настройки эти кнопки работают без пароля.</div>
   </div>
 </div>
 
@@ -896,7 +908,7 @@ function normalizeLeaderboard(list){
 */
 const SUPABASE_URL = 'https://wavgpplxjdidmtidhobh.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_44TXCp9E7tqjwZVMOE--Tw_SeVgR3zy';
-const VARENIKI_STATE_ID = 2; // отдельная строка site_state для Vareniki E-Sport Team
+const VARENIKI_STATE_ID = 2026082801; // УНИКАЛЬНАЯ строка site_state только для Vareniki E-Sport
 const CLOUD_ENABLED = !!window.supabase && SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('PASTE_');
 const db = CLOUD_ENABLED ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
@@ -1012,24 +1024,41 @@ async function saveRegistration(item){
 async function refreshCloud(){
   if(!CLOUD_ENABLED) return;
   try{
-    const {data:s,error:se} = await db.from('site_state').select('content,leaderboard').eq('id',VARENIKI_STATE_ID).maybeSingle();
+    // ВАЖНО: читаем только уникальную строку Vareniki, а не общий state друга.
+    const {data:s,error:se} = await db.from('site_state')
+      .select('content,leaderboard')
+      .eq('id',VARENIKI_STATE_ID)
+      .maybeSingle();
     if(se) console.warn('site_state read failed:', se.message);
-    if(s){
-      // ВАЖНО: не позволяем старому общему state/сайту King's Esports
-      // перезаписывать Vareniki при периодическом обновлении.
-      const foreignContent = looksLikeOtherSiteContent(s.content);
-      const foreignBoard = looksLikeOtherSiteLeaderboard(s.leaderboard);
-      if(s.content && typeof s.content==='object' && !foreignContent){
+
+    if(!s){
+      // Если уникальной строки ещё нет — создаём её с правильным состоянием Vareniki.
+      content = Object.assign({}, VARENIKI_DEFAULT_CONTENT);
+      leaderboard = normalizeLeaderboard(VARENIKI_DEFAULT_TEAMS);
+      const {error:seedError} = await db.from('site_state').upsert({
+        id:VARENIKI_STATE_ID,
+        content:content,
+        leaderboard:leaderboard,
+        updated_at:new Date().toISOString()
+      });
+      if(seedError) console.warn('Vareniki state seed failed:', seedError.message);
+    } else {
+      // Никаких данных из других строк/сайтов сюда не подмешиваем.
+      if(s.content && typeof s.content==='object'){
         content = Object.assign({}, VARENIKI_DEFAULT_CONTENT, s.content);
       }
-      if(Array.isArray(s.leaderboard) && !foreignBoard){
+      if(Array.isArray(s.leaderboard)){
         leaderboard = normalizeLeaderboard(s.leaderboard);
       }
-      if(looksLikeOtherSiteContent(content)) content = Object.assign({}, VARENIKI_DEFAULT_CONTENT);
-      if(looksLikeOtherSiteLeaderboard(leaderboard)) leaderboard = normalizeLeaderboard(VARENIKI_DEFAULT_TEAMS);
-      renderAll();
     }
-    const {data:r, error:re} = await db.from('registrations').select('id,nick,tag,tg,google,ts,email,team_name,teammates_count,teammate_tag,teammate_tag2,players_count,teammate_tag3,teammate_tag4').order('ts',{ascending:false});
+
+    if(!leaderboard.length) leaderboard = normalizeLeaderboard(VARENIKI_DEFAULT_TEAMS);
+    renderAll();
+
+    // Заявки читаются из существующей таблицы без user_id.
+    const {data:r,error:re} = await db.from('registrations')
+      .select('id,nick,tag,tg,google,ts,email,team_name,teammates_count,teammate_tag,teammate_tag2,players_count,teammate_tag3,teammate_tag4')
+      .order('ts',{ascending:false});
     if(re) console.warn('registrations read failed:', re.message);
     else if(Array.isArray(r)){
       registrations = r;
@@ -1316,6 +1345,15 @@ function goContact(){
 function getCurrentUser(){
   return window.__varenikiUser || null;
 }
+function getAuthProvider(user){
+  return user?.app_metadata?.provider || user?.identities?.[0]?.provider || 'email';
+}
+function getAuthProviderLabel(user){
+  const p=getAuthProvider(user);
+  if(p==='google') return 'Google';
+  if(p==='apple') return 'Apple';
+  return 'E-mail';
+}
 function updateUserUI(user){
   window.__varenikiUser = user || null;
   const btn=document.getElementById('userLoginBtn');
@@ -1326,13 +1364,32 @@ function updateUserUI(user){
   const box=document.getElementById('registrationAuthStatus');
   const status=document.getElementById('googleStatus');
   try{ if(user) setTimeout(tryAutoAdmin, 0); else if(isAdmin) logoutAdmin(); }catch(e){}
+  const provider=user ? getAuthProviderLabel(user) : '';
+  const email=user?.email || 'Аккаунт подключён';
   if(box){
     box.style.display='block';
     box.innerHTML=user
-      ? `<span>Аккаунт</span><b>${escapeHtml(user.email||'')}</b>`
+      ? `<span>${provider}</span><b>${escapeHtml(email)}</b>`
       : `<span>Статус</span><b style="color:var(--gold);">Нужно войти в аккаунт</b>`;
   }
-  if(status) status.textContent=user ? 'Аккаунт подтверждён ✓' : 'Не выполнен вход';
+  if(status) status.textContent=user ? `Вход выполнен через ${provider} ✓` : 'Не выполнен вход';
+}
+function oauthRedirectUrl(){
+  if(location.protocol==='http:' || location.protocol==='https:') return location.origin + location.pathname;
+  return null;
+}
+async function oauthLogin(provider){
+  if(!CLOUD_ENABLED){ authError('Supabase не подключён.'); return; }
+  if(provider!=='google' && provider!=='apple'){ authError('Неизвестный способ входа.'); return; }
+  try{
+    const redirectTo=oauthRedirectUrl();
+    const options={};
+    if(redirectTo) options.redirectTo=redirectTo;
+    const {error}=await db.auth.signInWithOAuth({provider, options});
+    if(error) authError(friendlyAuthError(error));
+  }catch(e){
+    authError(friendlyAuthError(e));
+  }
 }
 function openUserLogin(){
   document.getElementById('userLoginModal').classList.add('show');
@@ -1354,6 +1411,8 @@ function friendlyAuthError(error){
   if(low.includes('password should be at least')) return 'Пароль должен содержать минимум 6 символов.';
   if(low.includes('failed to fetch')) return 'Не удалось подключиться к Supabase. Проверьте интернет и настройки проекта.';
   if(low.includes('redirect')) return 'Supabase не разрешает адрес возврата. В Authentication → URL Configuration добавьте адрес сайта.';
+  if(low.includes('provider is not enabled') || low.includes('provider is disabled')) return 'Этот способ входа пока не включён в Supabase → Authentication → Providers.';
+  if(low.includes('unsupported provider')) return 'Этот провайдер не настроен в Supabase.';
   return msg;
 }
 async function userLogin(){
@@ -1517,7 +1576,7 @@ function regNext(step){
     document.getElementById('rvTg').textContent=tg;
     document.getElementById('rvPlayersCount').textContent=count;
     document.getElementById('rvPlayers').innerHTML=regData.players.map((p,i)=>`<div style="padding:7px 0;border-bottom:1px solid var(--line);font-size:13px;"><b style="color:var(--gold);">${i===0?'Капитан':'Игрок '+(i+1)}</b> — ${escapeHtml(p.nick)}</div>`).join('');
-    document.getElementById('rvGoogle').textContent=user.email?'Аккаунт подтверждён ✓':'—';
+    document.getElementById('rvGoogle').textContent=user.email?`${getAuthProviderLabel(user)} ✓`:'Аккаунт подключён ✓';
   }
   if(step===2&&!getCurrentUser()){showToast('Войдите в аккаунт');openUserLogin();return;}
   setStep(step+1);
