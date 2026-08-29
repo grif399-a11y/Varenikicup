@@ -299,6 +299,30 @@ section{padding:56px 0;}
 .admin .player-edit-toggle{display:inline-flex;}
 .team-member{cursor:pointer;transition:.18s;}
 .team-member:hover{border-color:var(--blue-bright);transform:translateY(-1px);}
+
+.team-achievements{display:grid;gap:9px;margin-top:12px;}
+.achievement-item{display:flex;align-items:center;gap:12px;padding:11px 13px;background:var(--navy-card2);border:1px solid var(--line);border-radius:13px;}
+.achievement-place{min-width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(245,185,66,.10);border:1px solid rgba(245,185,66,.28);color:var(--gold);font-family:'Anton';font-size:17px;}
+.achievement-info{min-width:0;flex:1;}
+.achievement-info b{display:block;font-size:13px;}
+.achievement-info span{display:block;color:var(--text-muted);font-size:11px;margin-top:3px;}
+.achievement-delete{border:1px solid rgba(255,107,107,.35);background:rgba(255,107,107,.06);color:#ff8a8a;border-radius:9px;padding:7px 9px;font-weight:800;}
+.achievement-editor{display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--line);}
+.admin .achievement-editor{display:block;}
+.admin-only-nav{display:none;}
+.admin .admin-only-nav{display:flex;}
+.participants-grid{display:grid;gap:14px;margin-top:22px;}
+.participant-card{background:var(--navy-card);border:1px solid var(--line);border-radius:18px;padding:18px;}
+.participant-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
+.participant-head h3{font-size:20px;}
+.participant-status{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--good);border:1px solid rgba(92,214,138,.25);background:rgba(92,214,138,.07);padding:6px 9px;border-radius:999px;}
+.participant-meta{color:var(--text-muted);font-size:12px;font-weight:700;margin-bottom:10px;}
+.participant-players{display:grid;gap:6px;color:#dfe4ff;font-size:13px;}
+.app-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.app-actions .btn{flex:1;min-width:120px;justify-content:center;}
+.application-pending{border-color:rgba(245,185,66,.35);}
+.application-approved{border-color:rgba(92,214,138,.28);}
+.admin-section-note{color:var(--text-muted);font-size:13px;line-height:1.6;margin:0 0 18px;}
 @media(max-width:600px){
   .player-modal{padding:22px;}
   .player-profile-head{gap:12px;}
@@ -439,6 +463,50 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
   .row .avatar{width:36px;height:36px;font-size:13px;}
   .tg-strip{flex-direction:column;text-align:center;}
 }
+
+/* ===== TOURNAMENTS / POSTS / BRACKET ===== */
+.tour-posts{display:grid;gap:18px;margin-top:22px;}
+.tour-post{background:linear-gradient(145deg,rgba(17,26,63,.96),rgba(10,15,44,.96));border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.18);}
+.tour-post-media{width:100%;max-height:430px;object-fit:cover;display:block;background:#070a1b;}
+.tour-post-body{padding:22px;}
+.tour-post-title{font-family:'Anton';font-size:25px;letter-spacing:.02em;margin-bottom:10px;text-transform:uppercase;}
+.tour-post-text{font-size:15px;line-height:1.7;color:#dfe4ff;white-space:normal;word-break:break-word;}
+.tour-post-link{display:inline-flex;align-items:center;gap:8px;margin-top:14px;color:var(--blue-bright);font-weight:800;text-decoration:none;word-break:break-all;}
+.tour-post-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--text-muted);}
+.tour-post-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+.admin-tournament-box{margin-top:22px;padding:22px;border:1px dashed var(--gold);border-radius:20px;background:rgba(245,185,66,.045);}
+.admin-tournament-box h3{font-size:18px;margin-bottom:14px;}
+.admin-post-form{display:grid;gap:12px;}
+.admin-post-form textarea{min-height:130px;resize:vertical;}
+.admin-post-form .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.admin-posts-list{margin-top:18px;display:grid;gap:10px;}
+.admin-post-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--navy-card2);}
+.admin-post-row span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.admin-mini-actions{display:flex;gap:7px;flex-shrink:0;}
+.btn-danger{border:1px solid rgba(255,107,107,.45);background:rgba(255,107,107,.08);color:#ff8a8a;padding:9px 12px;border-radius:10px;font-weight:800;}
+.bracket-wrap{overflow-x:auto;padding-bottom:10px;margin-top:22px;}
+.bracket{display:flex;align-items:stretch;gap:18px;min-width:max-content;padding:8px 2px 18px;}
+.bracket-round{width:190px;display:flex;flex-direction:column;}
+.bracket-round h4{font-family:'Anton';font-weight:400;text-transform:uppercase;letter-spacing:.05em;color:var(--gold);font-size:15px;margin:0 0 12px;text-align:center;}
+.bracket-matches{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:10px;}
+.bracket-match{position:relative;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--navy-card2);box-shadow:0 8px 24px rgba(0,0,0,.12);}
+.bracket-team{min-height:35px;display:flex;align-items:center;gap:8px;padding:7px 9px;font-size:12px;font-weight:800;border-bottom:1px solid var(--line);}
+.bracket-team:last-child{border-bottom:0;}
+.bracket-team small{margin-left:auto;color:var(--text-muted);font-size:10px;}
+.bracket-team.tbd{color:var(--text-muted);font-weight:600;}
+.bracket-final .bracket-team{min-height:40px;font-size:13px;}
+.bracket-note{font-size:13px;color:var(--text-muted);line-height:1.6;}
+.bracket-editor{margin-top:20px;padding:20px;border:1px dashed var(--gold);border-radius:18px;background:rgba(245,185,66,.04);}
+.bracket-editor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-height:460px;overflow:auto;padding-right:4px;}
+.bracket-editor-grid .field{margin-bottom:0;}
+.bracket-editor-grid label{font-size:11px;}
+.tournament-status{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:999px;background:rgba(92,214,138,.08);border:1px solid rgba(92,214,138,.25);color:var(--good);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;}
+.tournament-status.off{color:var(--text-muted);background:rgba(150,160,214,.06);border-color:var(--line);}
+.tournament-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;padding:24px;border-radius:22px;border:1px solid var(--line);background:radial-gradient(circle at 90% 20%,rgba(52,87,232,.22),transparent 38%),var(--navy-card2);}
+.tournament-hero h3{font-size:30px;margin:5px 0 8px;}
+.tournament-hero p{margin:0;color:var(--text-muted);line-height:1.6;}
+@media(max-width:680px){.admin-post-form .two,.bracket-editor-grid{grid-template-columns:1fr}.tournament-hero{display:block}.tournament-hero .btn{margin-top:16px}.bracket-round{width:165px}}
+
 </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -451,7 +519,6 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
       <div class="brand-name">VARENIKI<br><small>E-Sport Team</small></div>
     </div>
     <div class="header-actions">
-      <button class="btn-login" id="userLoginBtn" onclick="openUserLogin()">Вход</button>
       <button class="btn-login admin-entry" id="adminLoginBtn" onclick="openLogin()">Админка</button>
       <button class="burger" id="burgerBtn" onclick="toggleNav()"><span></span><span></span><span></span></button>
     </div>
@@ -467,6 +534,9 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
   <button class="nav-link" onclick="goPage('home')">Главная <span class="arrow">→</span></button>
   <button class="nav-link" onclick="goPage('tournaments')">Турниры <span class="arrow">→</span></button>
   <button class="nav-link" onclick="goPage('register')">Регистрация <span class="arrow">→</span></button>
+  <button class="nav-link" onclick="goPage('bracket')">Текущая сетка <span class="arrow">→</span></button>
+  <button class="nav-link" onclick="goPage('participants')">Участники <span class="arrow">→</span></button>
+  <button class="nav-link admin-only-nav" onclick="goPage('applications')">Заявки <span class="arrow">→</span></button>
   <button class="nav-link" onclick="goContact()">Контакты <span class="arrow">→</span></button>
   <div class="side-nav-foot">
     Официальное сообщество Vareniki E-Sport Team.<br>
@@ -586,6 +656,23 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
     </a>
   </div>
 
+
+  <div id="tournamentHero"></div>
+  <div class="tour-posts" id="tournamentPosts"></div>
+
+  <div class="admin-tournament-box" id="tournamentAdminBox" style="display:none;">
+    <h3>📰 Публикация как в Telegram</h3>
+    <div class="admin-post-form">
+      <div class="field"><label>Заголовок поста</label><input id="postTitleInput" maxlength="100" placeholder="Кубок Vareniki — регистрация открыта"></div>
+      <div class="field"><label>Текст поста</label><textarea id="postTextInput" placeholder="Пиши обычным текстом. Переносы строк сохранятся."></textarea></div>
+      <div class="admin-post-form two">
+        <div class="field"><label>Ссылка (необязательно)</label><input id="postLinkInput" type="url" placeholder="https://..."></div>
+        <div class="field"><label>Фото — ссылка на изображение</label><input id="postImageInput" type="url" placeholder="https://.../image.jpg"></div>
+      </div>
+      <div class="form-actions"><button class="btn btn-primary" onclick="publishTournamentPost()">Опубликовать пост</button><button class="btn btn-ghost" onclick="clearPostForm()">Очистить</button></div>
+    </div>
+    <div class="admin-posts-list" id="adminPostsList"></div>
+  </div>
   <div class="admin-announce-editor" id="announceEditorWrap" style="display:none;">
     <label style="font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);">Анонс турнира (виден всем, если не пустой)</label>
     <textarea id="announceEditor" placeholder="Например: Кубок сентября — регистрация открыта до 5 сентября, старт 8 сентября в 19:00 МСК."></textarea>
@@ -603,10 +690,9 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
 
     <div class="reg-progress"><i id="pg1" class="done"></i><i id="pg2"></i><i id="pg3"></i></div>
 
-    <div id="registrationAuthStatus" class="app-item" style="margin-bottom:18px;display:none;"></div>
-
     <!-- step 1 -->
     <div class="reg-step show" id="regStep1">
+      <div id="selectedTournamentBox" class="app-item" style="display:none;margin-bottom:16px;"><span>Турнир</span><b id="selectedTournamentName">—</b></div>
       <div class="field">
         <label>Название команды</label>
         <input type="text" id="regTeamName" maxlength="40" placeholder="Например: Vareniki Team">
@@ -632,15 +718,13 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
 
     <!-- step 2 -->
     <div class="reg-step" id="regStep2">
-      <p style="color:var(--text-muted);font-weight:600;font-size:14px;line-height:1.6;" data-editable="true" data-field="regAuthText">Подтвердите личность, чтобы мы могли связаться с вами по поводу турнира.</p>
-      <div class="google-box">
-        <div style="font-size:14px;font-weight:700;line-height:1.5;" data-editable="true" data-field="regAccountLabel">Аккаунт участника</div>
-        <span class="google-status" id="googleStatus">Проверяем вход...</span>
-        <button class="btn btn-ghost" style="margin-top:10px;width:100%;justify-content:center;" onclick="openUserLogin()" data-editable="true" data-field="regLoginButton">Войти / создать аккаунт</button>
-      </div>
+      <p style="color:var(--text-muted);font-weight:600;font-size:14px;line-height:1.6;">Проверьте введённые данные. Аккаунт для подачи заявки не требуется.</p>
+      <div class="app-item"><span>Команда</span><b id="rvTeamName2">—</b></div>
+      <div class="app-item"><span>Telegram</span><b id="rvTg2">—</b></div>
+      <div class="app-item"><span>Игроков</span><b id="rvPlayersCount2">3</b></div>
       <div class="form-actions">
-        <button class="btn btn-ghost" onclick="regBack(2)" data-editable="true" data-field="regBackButton">Назад</button>
-        <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="regNext(2)" data-editable="true" data-field="regContinueButton2">Продолжить</button>
+        <button class="btn btn-ghost" onclick="regBack(2)">Назад</button>
+        <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="regNext(2)">Продолжить</button>
       </div>
     </div>
 
@@ -651,10 +735,9 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
       <div class="app-item"><span>Telegram</span><b id="rvTg">—</b></div>
       <div class="app-item"><span>Игроков</span><b id="rvPlayersCount">3</b></div>
       <div class="app-item" style="display:block;"><span style="display:block;margin-bottom:8px;">Состав</span><div id="rvPlayers"></div></div>
-      <div class="app-item"><span>Аккаунт</span><b id="rvGoogle">—</b></div>
       <div class="form-actions">
         <button class="btn btn-ghost" onclick="regBack(3)">Назад</button>
-        <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="submitReg()">Подготовить заявку в Telegram</button>
+        <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="submitReg()">Отправить заявку</button>
       </div>
     </div>
 
@@ -662,12 +745,11 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
     <div class="reg-step" id="regSuccess">
       <div class="success-box">
         <div class="check">✓</div>
-        <h3 data-editable="true" data-field="regSuccessTitle">Заявка отправлена</h3>
-        <p>Заявка <span class="reg-id" id="successId"></span> сохранена. Нажмите кнопку ниже — Telegram откроется уже с готовым текстом заявки.</p>
-        <a class="btn btn-tg" id="telegramApplicationBtn" style="margin-top:18px;" href="#" target="_blank" rel="noopener">
-          <svg width="18" height="18" viewBox="0 0 240 240" fill="none"><circle cx="120" cy="120" r="120" fill="#3457E8"/><path d="M54 122l125-48c6-2 11 1 9 10l-21 100c-2 8-7 10-14 6l-38-28-18 17c-2 2-4 3-8 3l3-40 73-66c3-3-1-5-5-2l-90 57-39-12c-8-3-8-9 2-12z" fill="#fff"/></svg>
-          Турниры проходят тут
-        </a>
+        <h3 data-editable="true" data-field="regSuccessTitle">Заявка отправлена на проверку</h3>
+        <p>Заявка <span class="reg-id" id="successId"></span> сохранена. После проверки администрацией команда появится во вкладке «Участники».</p>
+        <button class="btn btn-primary" style="margin-top:18px;" onclick="goPage('tournaments')">
+          Вернуться к турнирам
+        </button>
       </div>
     </div>
   </div>
@@ -675,6 +757,47 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
   <div class="apps-list" id="appsList" style="max-width:520px;margin:0 auto;display:none;">
     <h4>Заявки (видно только админу)</h4>
     <div id="appsItems"></div>
+  </div>
+</main>
+
+<!-- ================= PARTICIPANTS ================= -->
+<main id="page-participants" class="page" style="display:none;">
+  <div class="section-head">
+    <div class="eyebrow">Public roster</div>
+    <h2>Участники</h2>
+  </div>
+  <p class="admin-section-note" style="max-width:680px;">Здесь показываются только подтверждённые заявки. Администратор сначала проверяет состав, затем публикует команду.</p>
+  <div id="participantsPublic" class="participants-grid"></div>
+</main>
+
+<!-- ================= APPLICATIONS / ADMIN ================= -->
+<main id="page-applications" class="page" style="display:none;">
+  <div class="section-head">
+    <div class="eyebrow">Admin panel</div>
+    <h2>Заявки</h2>
+  </div>
+  <div id="applicationsAdminOnly"></div>
+</main>
+
+<!-- ================= CURRENT BRACKET ================= -->
+<main id="page-bracket" class="page" style="display:none;">
+  <div class="section-head">
+    <div class="eyebrow">Live Bracket</div>
+    <h2>Текущая сетка</h2>
+  </div>
+  <div id="bracketHero"></div>
+  <div class="bracket-wrap" id="bracketPublic"></div>
+  <div class="bracket-editor" id="bracketAdmin" style="display:none;">
+    <h3>⚙️ Настройка турнирной сетки</h3>
+    <p class="bracket-note">Выбери количество команд от 8 до 64 и впиши названия. После сохранения сетка сразу обновится для всех посетителей.</p>
+    <div class="admin-post-form" style="margin-top:15px;">
+      <div class="admin-post-form two">
+        <div class="field"><label>Название турнира</label><input id="bracketTitleInput" type="text" maxlength="80" placeholder="Vareniki Cup #1"></div>
+        <div class="field"><label>Количество команд</label><select id="bracketCountInput"></select></div>
+      </div>
+      <div id="bracketTeamInputs" class="bracket-editor-grid"></div>
+      <div class="form-actions"><button class="btn btn-primary" onclick="saveBracketSettings()">Сохранить сетку</button><button class="btn btn-ghost" onclick="fillBracketDemo()">Заполнить пустыми</button></div>
+    </div>
   </div>
 </main>
 
@@ -708,6 +831,25 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
     <div style="margin-top:20px;">
       <label style="display:block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Состав</label>
       <div class="team-members" id="teamModalMembers"></div>
+    </div>
+    <button class="btn btn-ghost" type="button" style="margin-top:20px;" onclick="toggleTeamAchievements()">🏆 Достижения</button>
+    <div id="teamAchievementsPanel" style="margin-top:4px;">
+      <div style="margin-top:16px;">
+      <label style="display:block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Достижения</label>
+      <div class="team-achievements" id="teamModalAchievements"></div>
+      <div class="achievement-editor" id="achievementEditor">
+        <div class="field">
+          <label>Новое достижение</label>
+          <div class="admin-post-form two">
+            <select id="achievementPlace">
+              <option value="1">1 место</option><option value="2">2 место</option><option value="3">3 место</option><option value="4">4 место</option><option value="5">5 место</option>
+            </select>
+            <input id="achievementTournament" maxlength="100" placeholder="Название турнира">
+          </div>
+        </div>
+        <button class="btn btn-primary" type="button" onclick="addTeamAchievement()">+ Добавить достижение</button>
+      </div>
+    </div>
     </div>
     <button class="btn btn-ghost team-edit-toggle" id="teamEditToggle" onclick="toggleTeamEditor()">✎ Редактировать команду</button>
     <div class="team-editor" id="teamEditor">
@@ -773,41 +915,6 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
   </div>
 </div>
 
-<!-- user login / registration modal -->
-<div class="modal-overlay" id="userLoginModal">
-  <div class="modal" id="userLoginModalBox">
-    <button class="modal-close" onclick="closeUserLogin()">✕</button>
-    <h3>Аккаунт участника</h3>
-    <p class="sub">Войдите или создайте аккаунт, чтобы использовать сайт как участник.</p>
-    <div class="field">
-      <label>E-mail</label>
-      <input type="email" id="userEmail" autocomplete="email" placeholder="you@example.com">
-    </div>
-    <div class="field">
-      <label>Пароль</label>
-      <input type="password" id="userPassword" autocomplete="current-password" placeholder="Минимум 6 символов">
-    </div>
-    <div class="form-actions" style="flex-direction:column;">
-      <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="userLogin()">Войти</button>
-      <button class="btn btn-ghost" style="width:100%;justify-content:center;" onclick="userSignup()">Зарегистрироваться по e-mail</button>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--text-muted);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;">
-      <span style="height:1px;background:var(--line);flex:1"></span><span>или</span><span style="height:1px;background:var(--line);flex:1"></span>
-    </div>
-    <div style="display:grid;gap:10px;">
-      <button class="btn btn-ghost" style="width:100%;justify-content:center;" onclick="oauthLogin('google')">
-        <span style="font-weight:900;font-size:17px;line-height:1;">G</span> Войти через Google
-      </button>
-      <button class="btn btn-ghost" style="width:100%;justify-content:center;" onclick="oauthLogin('apple')">
-        <span style="font-size:18px;line-height:1;"></span> Войти через Apple
-      </button>
-    </div>
-    <div class="err" id="userLoginErr"></div>
-    <button type="button" class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px;" onclick="resendConfirmation()">Повторно отправить письмо подтверждения</button>
-    <div style="margin-top:12px;color:var(--text-muted);font-size:12px;line-height:1.5;text-align:center;">Google и Apple требуют одноразовой настройки провайдеров в Supabase. После настройки эти кнопки работают без пароля.</div>
-  </div>
-</div>
-
 <!-- login modal -->
 <div class="modal-overlay" id="loginModal">
   <div class="modal" id="loginModalBox">
@@ -824,7 +931,7 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
 </div>
 
 <div class="admin-bar" id="adminBar">
-  ⚙️ Режим администратора включён — текст сайта, анкеты и таблица сохраняются автоматически. Текст с подсветкой можно менять прямо на странице.
+  ⚙️ Режим администратора включён — текст сайта, заявки, достижения и таблица сохраняются автоматически. Текст с подсветкой можно менять прямо на странице.
   <button onclick="logoutAdmin()">Выйти из режима админа</button>
 </div>
 
@@ -853,9 +960,9 @@ let content = {
   regSubstitutesHint:"Можно выбрать только 0, 1 или 2.",
   regSubstitute1Label:"Тег замены 1",
   regSubstitute2Label:"Тег замены 2",
-  regAuthText:"Подтвердите личность, чтобы мы могли связаться с вами по поводу турнира.",
-  regAccountLabel:"Аккаунт участника",
-  regLoginButton:"Войти / создать аккаунт",
+  regAuthText:"Проверьте введённые данные перед отправкой заявки.",
+  regAccountLabel:"Без аккаунта",
+  regLoginButton:"",
   regContinueButton:"Продолжить",
   regContinueButton2:"Продолжить",
   regBackButton:"Назад",
@@ -897,18 +1004,18 @@ function normalizeLeaderboard(list){
     points: Number.isFinite(Number(row.points)) ? Number(row.points) : 0,
     img: row.img || '',
     description: typeof row.description === 'string' ? row.description : '',
-    members: Array.isArray(row.members) ? row.members.filter(Boolean).map((m,n)=>normalizePlayer(m,n)) : []
+    members: Array.isArray(row.members) ? row.members.filter(Boolean).map((m,n)=>normalizePlayer(m,n)) : [],
+    achievements: Array.isArray(row.achievements) ? row.achievements.filter(Boolean).map(a=>({place:Math.max(1,Math.min(5,Number(a.place)||1)),tournament:String(a.tournament||'Турнир'),created_at:a.created_at||Date.now()})) : []
   }));
 }
 
 /* ================= STORAGE ================= */
 /* ================= CLOUD STORAGE =================
    Для общей базы данных вставьте сюда Supabase URL и anon key.
-   
+   SQL для базы приведён в комментарии внизу файла.
 */
-const SUPABASE_URL = 'https://wavgpplxjdidmtidhobh.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_44TXCp9E7tqjwZVMOE--Tw_SeVgR3zy';
-const VARENIKI_STATE_ID = 2026082801; // УНИКАЛЬНАЯ строка site_state только для Vareniki E-Sport
+const SUPABASE_URL = 'https://dnvfsoycyrtxlbcllgrs.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_vSa0gUramulavgHkeJavPA_yD3RHOV-';
 const CLOUD_ENABLED = !!window.supabase && SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('PASTE_');
 const db = CLOUD_ENABLED ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
@@ -922,51 +1029,16 @@ function localSave(key, value){
   try{ localStorage.setItem('vareniki_' + key, JSON.stringify(value)); }catch(e){}
 }
 
-const VARENIKI_DEFAULT_CONTENT = {
-  heroTitle:"Лепим победы,<br><span class=\"accent\">как вареники</span>",
-  heroTagline:"Vareniki E-Sport Team — команда и сообщество игроков Brawl Stars. Мы организуем турниры, ведём рейтинг сильнейших и растим новых чемпионов.",
-  aboutText1:"Vareniki E-Sport Team появилась как небольшое комьюнити игроков Brawl Stars и выросла в организацию, которая регулярно проводит турниры для команд любого уровня — от новичков до опытных бойцов трофейной лиги.",
-  aboutText2:"Мы ведём открытую таблицу очков, публикуем расписание в Telegram-канале и следим за тем, чтобы каждый турнир проходил честно и без задержек.",
-  tEmptyTitle:"Пока турниров нет",
-  tEmptyText:"Мы готовим расписание нового сезона Brawl Stars. Как только даты будут подтверждены, здесь появится турнирная сетка — а анонс придёт в Telegram первым.",
-  footerText:"© 2026 Vareniki E-Sport Team. Турниры по Brawl Stars.",
-  contactTitle:"Связаться с администрацией",
-  contactText:"Вопросы по турнирам, партнёрству и сотрудничеству — пишите напрямую организатору.",
-  announcement:""
-};
-const VARENIKI_DEFAULT_TEAMS = [
-  {id:1,name:"HATE RICO",points:5,img:"",description:"",members:[]},
-  {id:2,name:"THE SHADOWS",points:3,img:"",description:"",members:[]},
-  {id:3,name:"LOLO TEAM",points:1,img:"",description:"",members:[]},
-  {id:4,name:"VARENIKI TEAM AC",points:1,img:"",description:"",members:[]}
-];
-function looksLikeOtherSiteContent(obj){
-  const text=JSON.stringify(obj||{}).toLowerCase();
-  return text.includes("king's esports") || text.includes("king’s esports") || text.includes("kings esports");
-}
-function looksLikeOtherSiteLeaderboard(list){
-  const text=JSON.stringify(list||[]).toLowerCase();
-  return text.includes("king's esports") || text.includes("king’s esports") || text.includes("kings esports");
-}
 async function loadAll(){
   leaderboard = normalizeLeaderboard(leaderboard);
-
   if(CLOUD_ENABLED){
     try{
-      const {data:s, error} = await db.from('site_state').select('content,leaderboard').eq('id',VARENIKI_STATE_ID).maybeSingle();
+      const {data:s, error} = await db.from('site_state').select('content,leaderboard').eq('id',1).maybeSingle();
       if(!error && s){
-        if(s.content && !looksLikeOtherSiteContent(s.content)) content = Object.assign({}, VARENIKI_DEFAULT_CONTENT, s.content);
-        if(Array.isArray(s.leaderboard) && !looksLikeOtherSiteLeaderboard(s.leaderboard)) leaderboard = normalizeLeaderboard(s.leaderboard);
-      } else if(!error && !s){
-        // First launch on the isolated Vareniki row: seed it with the correct Vareniki text and teams.
-        content = Object.assign({}, VARENIKI_DEFAULT_CONTENT);
-        leaderboard = normalizeLeaderboard(VARENIKI_DEFAULT_TEAMS);
-        try{ await db.from('site_state').upsert({id:VARENIKI_STATE_ID, content:content, leaderboard:leaderboard, updated_at:new Date().toISOString()}); }catch(seedError){ console.warn('Vareniki state seed failed:', seedError); }
+        if(s.content) content = Object.assign(content, s.content);
+        if(Array.isArray(s.leaderboard)) leaderboard = normalizeLeaderboard(s.leaderboard);
       }
-      // If an old shared database still contains the other site's content, keep Vareniki defaults visible.
-      if(looksLikeOtherSiteContent(content)) content = Object.assign({}, content, VARENIKI_DEFAULT_CONTENT);
-      if(looksLikeOtherSiteLeaderboard(leaderboard)) leaderboard = normalizeLeaderboard(VARENIKI_DEFAULT_TEAMS);
-      const {data:r, error:re} = await db.from('registrations').select('id,nick,tag,tg,google,ts,email,team_name,teammates_count,teammate_tag,teammate_tag2,players_count,teammate_tag3,teammate_tag4').order('ts',{ascending:false});
+      const {data:r, error:re} = await db.from('registrations').select('id,email,nick,tag,tg,google,ts,team_name,teammates_count,teammate_tag,teammate_tag2,players_count,teammate_tag3,teammate_tag4').order('ts',{ascending:false});
       if(!re && Array.isArray(r)) registrations = r;
     }catch(e){ console.warn('Cloud load failed', e); }
   } else {
@@ -974,9 +1046,6 @@ async function loadAll(){
     leaderboard = normalizeLeaderboard(localLoad('leaderboard', leaderboard));
     registrations = localLoad('registrations', []);
   }
-  if(!leaderboard.length) leaderboard = normalizeLeaderboard(VARENIKI_DEFAULT_TEAMS);
-  if(looksLikeOtherSiteContent(content)) content = Object.assign({}, content, VARENIKI_DEFAULT_CONTENT);
-  if(looksLikeOtherSiteLeaderboard(leaderboard)) leaderboard = normalizeLeaderboard(VARENIKI_DEFAULT_TEAMS);
   renderAll();
 }
 
@@ -987,7 +1056,7 @@ async function saveCloudState(){
     return;
   }
   const {error} = await db.from('site_state').upsert({
-    id:VARENIKI_STATE_ID,
+    id:1,
     content:content,
     leaderboard:leaderboard,
     updated_at:new Date().toISOString()
@@ -1024,41 +1093,14 @@ async function saveRegistration(item){
 async function refreshCloud(){
   if(!CLOUD_ENABLED) return;
   try{
-    // ВАЖНО: читаем только уникальную строку Vareniki, а не общий state друга.
-    const {data:s,error:se} = await db.from('site_state')
-      .select('content,leaderboard')
-      .eq('id',VARENIKI_STATE_ID)
-      .maybeSingle();
+    const {data:s,error:se} = await db.from('site_state').select('content,leaderboard').eq('id',1).maybeSingle();
     if(se) console.warn('site_state read failed:', se.message);
-
-    if(!s){
-      // Если уникальной строки ещё нет — создаём её с правильным состоянием Vareniki.
-      content = Object.assign({}, VARENIKI_DEFAULT_CONTENT);
-      leaderboard = normalizeLeaderboard(VARENIKI_DEFAULT_TEAMS);
-      const {error:seedError} = await db.from('site_state').upsert({
-        id:VARENIKI_STATE_ID,
-        content:content,
-        leaderboard:leaderboard,
-        updated_at:new Date().toISOString()
-      });
-      if(seedError) console.warn('Vareniki state seed failed:', seedError.message);
-    } else {
-      // Никаких данных из других строк/сайтов сюда не подмешиваем.
-      if(s.content && typeof s.content==='object'){
-        content = Object.assign({}, VARENIKI_DEFAULT_CONTENT, s.content);
-      }
-      if(Array.isArray(s.leaderboard)){
-        leaderboard = normalizeLeaderboard(s.leaderboard);
-      }
+    if(s){
+      if(s.content && typeof s.content==='object') content = Object.assign(content, s.content);
+      if(Array.isArray(s.leaderboard)) leaderboard = normalizeLeaderboard(s.leaderboard);
+      renderAll();
     }
-
-    if(!leaderboard.length) leaderboard = normalizeLeaderboard(VARENIKI_DEFAULT_TEAMS);
-    renderAll();
-
-    // Заявки читаются из существующей таблицы без user_id.
-    const {data:r,error:re} = await db.from('registrations')
-      .select('id,nick,tag,tg,google,ts,email,team_name,teammates_count,teammate_tag,teammate_tag2,players_count,teammate_tag3,teammate_tag4')
-      .order('ts',{ascending:false});
+    const {data:r, error:re} = await db.from('registrations').select('id,email,nick,tag,tg,google,ts,team_name,teammates_count,teammate_tag,teammate_tag2,players_count,teammate_tag3,teammate_tag4').order('ts',{ascending:false});
     if(re) console.warn('registrations read failed:', re.message);
     else if(Array.isArray(r)){
       registrations = r;
@@ -1077,6 +1119,8 @@ function renderAll(){
   renderBoard();
   renderAnnouncement();
   renderApps();
+  if(typeof renderParticipants==='function')renderParticipants();
+  if(typeof renderApplicationsAdmin==='function')renderApplicationsAdmin();
   document.getElementById('announceEditor').value = content.announcement || "";
   document.body.classList.toggle('admin', isAdmin);
   document.querySelectorAll('[data-editable="true"]').forEach(el=>{
@@ -1163,7 +1207,7 @@ function addRow(){
   if(!isAdmin) return;
   leaderboard.push({
     id:Date.now(), name:"Новая команда", points:0, img:"",
-    description:"Информация о команде пока не добавлена.", members:[]
+    description:"Информация о команде пока не добавлена.", members:[], achievements:[]
   });
   saveLeaderboard(); renderBoard();
   openTeamModal(leaderboard.length-1,true);
@@ -1195,10 +1239,42 @@ function openTeamModal(index,editImmediately=false){
   members.innerHTML=row.members.length
     ? row.members.map((m,n)=>`<div class="team-member" onclick="openPlayerModal(${index},${n})"><span class="num">#${n+1}</span><span class="member-name">${escapeHtml(String(m.nick||''))}</span><span style="color:var(--blue-bright);font-size:12px;">→</span></div>`).join('')
     : '<div class="team-empty">Состав пока не указан.</div>';
+  renderTeamAchievements(index);
   document.getElementById('teamModal').classList.add('show');
   document.getElementById('teamEditor').classList.remove('show');
   if(editImmediately&&isAdmin)toggleTeamEditor(true);
 }
+
+function toggleTeamAchievements(){
+  const panel=document.getElementById('teamAchievementsPanel');
+  if(panel)panel.style.display=panel.style.display==='none'?'block':'none';
+}
+function renderTeamAchievements(index){
+  const row=leaderboard[index]; const box=document.getElementById('teamModalAchievements');
+  if(!box||!row)return;
+  row.achievements=Array.isArray(row.achievements)?row.achievements:[];
+  const sorted=row.achievements.slice().sort((a,b)=>Number(a.place)-Number(b.place));
+  box.innerHTML=sorted.length ? sorted.map((a,i)=>`<div class="achievement-item"><div class="achievement-place">${Number(a.place)||1}</div><div class="achievement-info"><b>${Number(a.place)===1?'1 место':Number(a.place)===2?'2 место':Number(a.place)===3?'3 место':Number(a.place)===4?'4 место':'5 место'}</b><span>${escapeHtml(String(a.tournament||'Турнир'))}</span></div>${isAdmin?`<button class="achievement-delete" onclick="deleteTeamAchievement(${index},${row.achievements.indexOf(a)})">Удалить</button>`:''}</div>`).join('') : '<div class="team-empty">Достижений пока нет.</div>';
+}
+async function addTeamAchievement(){
+  if(!isAdmin||openedTeamIndex===null)return;
+  const row=leaderboard[openedTeamIndex]; if(!row)return;
+  const place=Math.max(1,Math.min(5,Number(document.getElementById('achievementPlace').value)||1));
+  const tournament=document.getElementById('achievementTournament').value.trim();
+  if(!tournament){showToast('Впишите название турнира');return;}
+  row.achievements=Array.isArray(row.achievements)?row.achievements:[];
+  row.achievements.push({place,tournament,created_at:Date.now()});
+  await saveLeaderboard(); document.getElementById('achievementTournament').value=''; renderTeamAchievements(openedTeamIndex); showToast('Достижение добавлено');
+}
+async function deleteTeamAchievement(teamIndex,achievementIndex){
+  if(!isAdmin)return;
+  const row=leaderboard[teamIndex]; if(!row||!Array.isArray(row.achievements))return;
+  if(!confirm('Удалить это достижение?'))return;
+  row.achievements.splice(achievementIndex,1);
+  await saveLeaderboard();
+  if(openedTeamIndex===teamIndex)renderTeamAchievements(teamIndex);
+}
+
 function closeTeamModal(){document.getElementById('teamModal').classList.remove('show');openedTeamIndex=null;}
 function toggleTeamEditor(force){
   if(!isAdmin||openedTeamIndex===null)return;
@@ -1293,14 +1369,11 @@ function renderAnnouncement(){
 function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
 
 function parseRegistration(r){
-  // Совместимо с реальной схемой public.registrations:
-  // nick = капитан, teammate_tag* = остальные игроки, players_count = 3..5.
-  const count=Math.max(0, Math.min(5, Number(r.players_count)||0));
-  const rawPlayers=[r.nick,r.teammate_tag,r.teammate_tag2,r.teammate_tag3,r.teammate_tag4];
-  const players=rawPlayers.slice(0,count).filter(v=>String(v||'').trim()).map((v,i)=>({
-    nick:String(v), avatar:'', screenshot:'', about:''
-  }));
-  return {...r, team_name:r.team_name||r.nick||'Без названия', players_count:count, players};
+  try{
+    const parsed=typeof r.nick==='string'?JSON.parse(r.nick):null;
+    if(parsed&&parsed.team_name)return {...r,...parsed,nick:parsed.team_name};
+  }catch(e){}
+  return {...r,team_name:r.team_name||r.nick||'Без названия',players_count:Number(r.players_count)||0,players:Array.isArray(r.players)?r.players:[]};
 }
 function renderApps(){
   const list=document.getElementById('appsList');const items=document.getElementById('appsItems');
@@ -1311,6 +1384,58 @@ function renderApps(){
     const r=parseRegistration(raw);
     return `<div class="app-item" style="display:block;"><b style="display:block;margin-bottom:6px;">${escapeHtml(r.team_name)}</b><span>${escapeHtml(r.tg||'')} · игроков: ${Number(r.players_count)||0}</span><div style="margin-top:8px;color:var(--text-muted);font-size:12px;">${(r.players||[]).map((p,i)=>escapeHtml((i===0?'Капитан':'Игрок '+(i+1))+': '+(typeof p==='string'?p:p.nick))).join('<br>')}</div></div>`;
   }).join('');
+}
+
+
+/* ================= APPLICATIONS / PARTICIPANTS ================= */
+function ensureApplications(){
+  if(!content.tournaments || typeof content.tournaments!=='object')content.tournaments={};
+  if(!Array.isArray(content.tournaments.applications))content.tournaments.applications=[];
+  return content.tournaments.applications;
+}
+function applicationPlayersHtml(players){
+  return (Array.isArray(players)?players:[]).map((p,i)=>`<div><b>${i===0?'Капитан':'Игрок '+(i+1)}:</b> ${escapeHtml(String(typeof p==='string'?p:p?.nick||''))}</div>`).join('');
+}
+function renderParticipants(){
+  const box=document.getElementById('participantsPublic'); if(!box)return;
+  const apps=ensureApplications().filter(a=>a.status==='approved');
+  box.innerHTML=apps.length ? apps.slice().sort((a,b)=>Number(b.created_at||0)-Number(a.created_at||0)).map(a=>`
+    <article class="participant-card application-approved">
+      <div class="participant-head"><h3>${escapeHtml(a.team_name||'Команда')}</h3><span class="participant-status">Подтверждено</span></div>
+      <div class="participant-meta">${escapeHtml(a.tournament_name||'Турнир')} · ${escapeHtml(a.tg||'')}</div>
+      <div class="participant-players">${applicationPlayersHtml(a.players)}</div>
+    </article>`).join('') : '<div class="empty-state"><div class="icon">👥</div><h3>Пока нет подтверждённых участников</h3><p>После проверки заявок администрацией команды появятся здесь.</p></div>';
+}
+async function approveApplication(id){
+  if(!isAdmin)return;
+  const apps=ensureApplications(); const a=apps.find(x=>x.id===id); if(!a)return;
+  a.status='approved'; a.approved_at=Date.now();
+  await saveContent(); renderApplicationsAdmin(); renderParticipants(); showToast('Заявка подтверждена и опубликована');
+}
+async function deleteApplication(id){
+  if(!isAdmin)return;
+  if(!confirm('Удалить заявку? Она исчезнет из списка заявок и участников.'))return;
+  content.tournaments.applications=ensureApplications().filter(x=>x.id!==id);
+  await saveContent(); renderApplicationsAdmin(); renderParticipants(); showToast('Заявка удалена');
+}
+function renderApplicationsAdmin(){
+  const box=document.getElementById('applicationsAdminOnly'); if(!box)return;
+  if(!isAdmin){box.innerHTML='<div class="empty-state"><div class="icon">🔒</div><h3>Только для администратора</h3><p>Откройте режим администратора, чтобы видеть заявки.</p></div>';return;}
+  const apps=ensureApplications().slice().sort((a,b)=>Number(b.created_at||0)-Number(a.created_at||0));
+  box.innerHTML=`<div class="card" style="padding:24px;">
+    <p class="admin-section-note">Новые заявки сначала имеют статус <b style="color:var(--gold);">на проверке</b>. Нажми «Подтвердить» — команда появится во вкладке «Участники». «Удалить» полностью убирает заявку.</p>
+    <div class="participants-grid">
+      ${apps.length?apps.map(a=>{
+        const approved=a.status==='approved';
+        return `<article class="participant-card ${approved?'application-approved':'application-pending'}">
+          <div class="participant-head"><h3>${escapeHtml(a.team_name||'Команда')}</h3><span class="participant-status" style="${approved?'':'color:var(--gold);border-color:rgba(245,185,66,.28);background:rgba(245,185,66,.06);'}">${approved?'Опубликовано':'На проверке'}</span></div>
+          <div class="participant-meta">${escapeHtml(a.tournament_name||'Турнир')} · ${escapeHtml(a.tg||'')} · ${formatDate(a.created_at)}</div>
+          <div class="participant-players">${applicationPlayersHtml(a.players)}</div>
+          <div class="app-actions">${approved?'':`<button class="btn btn-primary" onclick="approveApplication('${escapeAttr(a.id)}')">✓ Подтвердить</button>`}<button class="btn btn-danger" onclick="deleteApplication('${escapeAttr(a.id)}')">✕ Удалить</button></div>
+        </article>`;
+      }).join(''):'<div class="empty-state"><div class="icon">📭</div><h3>Заявок пока нет</h3><p>Когда кто-то подаст заявку, она появится здесь.</p></div>'}
+    </div>
+  </div>`;
 }
 
 /* ================= NAV ================= */
@@ -1325,12 +1450,21 @@ function closeNav(){
   document.getElementById('burgerBtn').classList.remove('open');
 }
 function goPage(name){
-  ['home','tournaments','register'].forEach(p=>{
-    document.getElementById('page-'+p).style.display = (p===name) ? '' : 'none';
+  const pages=['home','tournaments','register','bracket','participants','applications'];
+  if(name==='applications' && !isAdmin){showToast('Раздел доступен только администратору');name='home';}
+  pages.forEach(p=>{
+    const el=document.getElementById('page-'+p);
+    if(el) el.style.display = (p===name) ? '' : 'none';
   });
   document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  const active=document.querySelector('.nav-link[onclick*="goPage(\''+name+'\')"]');
+  if(active)active.classList.add('active');
   window.scrollTo({top:0, behavior:'smooth'});
   closeNav();
+  if(name==='tournaments') renderTournamentFeatures();
+  if(name==='bracket') renderBracket();
+  if(name==='participants') renderParticipants();
+  if(name==='applications') renderApplicationsAdmin();
 }
 function goContact(){
   goPage('home');
@@ -1341,164 +1475,8 @@ function goContact(){
 }
 
 /* ================= LOGIN / ADMIN ================= */
-/* ================= USER AUTH ================= */
-function getCurrentUser(){
-  return window.__varenikiUser || null;
-}
-function getAuthProvider(user){
-  return user?.app_metadata?.provider || user?.identities?.[0]?.provider || 'email';
-}
-function getAuthProviderLabel(user){
-  const p=getAuthProvider(user);
-  if(p==='google') return 'Google';
-  if(p==='apple') return 'Apple';
-  return 'E-mail';
-}
-function updateUserUI(user){
-  window.__varenikiUser = user || null;
-  const btn=document.getElementById('userLoginBtn');
-  if(btn){
-    btn.textContent=user ? 'Выход' : 'Вход';
-    btn.onclick=user ? userLogout : openUserLogin;
-  }
-  const box=document.getElementById('registrationAuthStatus');
-  const status=document.getElementById('googleStatus');
-  try{ if(user) setTimeout(tryAutoAdmin, 0); else if(isAdmin) logoutAdmin(); }catch(e){}
-  const provider=user ? getAuthProviderLabel(user) : '';
-  const email=user?.email || 'Аккаунт подключён';
-  if(box){
-    box.style.display='block';
-    box.innerHTML=user
-      ? `<span>${provider}</span><b>${escapeHtml(email)}</b>`
-      : `<span>Статус</span><b style="color:var(--gold);">Нужно войти в аккаунт</b>`;
-  }
-  if(status) status.textContent=user ? `Вход выполнен через ${provider} ✓` : 'Не выполнен вход';
-}
-function oauthRedirectUrl(){
-  if(location.protocol==='http:' || location.protocol==='https:') return location.origin + location.pathname;
-  return null;
-}
-async function oauthLogin(provider){
-  if(!CLOUD_ENABLED){ authError('Supabase не подключён.'); return; }
-  if(provider!=='google' && provider!=='apple'){ authError('Неизвестный способ входа.'); return; }
-  try{
-    const redirectTo=oauthRedirectUrl();
-    const options={};
-    if(redirectTo) options.redirectTo=redirectTo;
-    const {error}=await db.auth.signInWithOAuth({provider, options});
-    if(error) authError(friendlyAuthError(error));
-  }catch(e){
-    authError(friendlyAuthError(e));
-  }
-}
-function openUserLogin(){
-  document.getElementById('userLoginModal').classList.add('show');
-  document.getElementById('userLoginErr').classList.remove('show');
-  setTimeout(()=>document.getElementById('userEmail').focus(),50);
-}
-function closeUserLogin(){ document.getElementById('userLoginModal').classList.remove('show'); }
-function authError(message){
-  const e=document.getElementById('userLoginErr');
-  e.textContent=message; e.classList.add('show');
-}
-function friendlyAuthError(error){
-  const msg = String(error?.message || error || 'Неизвестная ошибка');
-  const low = msg.toLowerCase();
-  if(low.includes('invalid login credentials')) return 'Неверный e-mail или пароль.';
-  if(low.includes('email not confirmed')) return 'E-mail ещё не подтверждён. Проверьте почту и перейдите по ссылке подтверждения.';
-  if(low.includes('user already registered')) return 'Этот e-mail уже зарегистрирован. Нажмите «Войти».';
-  if(low.includes('email signups are disabled')) return 'Регистрация по e-mail отключена в Supabase. Включите Authentication → Providers → Email.';
-  if(low.includes('password should be at least')) return 'Пароль должен содержать минимум 6 символов.';
-  if(low.includes('failed to fetch')) return 'Не удалось подключиться к Supabase. Проверьте интернет и настройки проекта.';
-  if(low.includes('redirect')) return 'Supabase не разрешает адрес возврата. В Authentication → URL Configuration добавьте адрес сайта.';
-  if(low.includes('provider is not enabled') || low.includes('provider is disabled')) return 'Этот способ входа пока не включён в Supabase → Authentication → Providers.';
-  if(low.includes('unsupported provider')) return 'Этот провайдер не настроен в Supabase.';
-  return msg;
-}
-async function userLogin(){
-  if(!CLOUD_ENABLED){ authError('Supabase не подключён.'); return; }
-  const email=document.getElementById('userEmail').value.trim().toLowerCase();
-  const password=document.getElementById('userPassword').value;
-  if(!email || !password){ authError('Введите e-mail и пароль.'); return; }
-  const {data,error}=await db.auth.signInWithPassword({email,password});
-  if(error){ authError(friendlyAuthError(error)); return; }
-  if(!data?.session || !data?.user){ authError('Supabase не вернул активную сессию. Попробуйте ещё раз.'); return; }
-  updateUserUI(data.user);
-  document.getElementById('userPassword').value='';
-  closeUserLogin();
-  showToast('Вы вошли в аккаунт');
-}
-async function userSignup(){
-  if(!CLOUD_ENABLED){ authError('Supabase не подключён.'); return; }
-  const email=document.getElementById('userEmail').value.trim().toLowerCase();
-  const password=document.getElementById('userPassword').value;
-  if(!email){ authError('Введите e-mail.'); return; }
-  if(password.length<6){ authError('Пароль должен содержать минимум 6 символов.'); return; }
-  const options = {};
-  // Если сайт открыт через нормальный https/http-хостинг, возвращаем пользователя на этот же сайт после подтверждения.
-  if(location.protocol === 'http:' || location.protocol === 'https:'){
-    options.emailRedirectTo = location.origin + location.pathname;
-  }
-  const {data,error}=await db.auth.signUp({email,password,options});
-  if(error){ authError(friendlyAuthError(error)); return; }
-  document.getElementById('userPassword').value='';
-  if(data?.session && data?.user){
-    updateUserUI(data.user);
-    closeUserLogin();
-    showToast('Аккаунт создан и вы вошли');
-  }else{
-    authError('Аккаунт создан. Проверьте почту. Если подтверждение включено, перейдите по ссылке из письма, затем вернитесь на сайт и нажмите «Войти».');
-  }
-}
-async function userLogout(){
-  if(CLOUD_ENABLED) await db.auth.signOut();
-  updateUserUI(null);
-  showToast('Вы вышли из аккаунта');
-}
-async function resendConfirmation(){
-  if(!CLOUD_ENABLED){ authError('Supabase не подключён.'); return; }
-  const email=document.getElementById('userEmail').value.trim().toLowerCase();
-  if(!email){ authError('Сначала введите e-mail.'); return; }
-  const {error}=await db.auth.resend({type:'signup', email});
-  if(error){ authError(friendlyAuthError(error)); return; }
-  authError('Письмо подтверждения отправлено повторно. Проверьте «Спам».');
-}
-
-if(CLOUD_ENABLED){
-  db.auth.getSession().then(({data,error})=>{
-    if(error) console.warn('Auth session error:', error);
-    updateUserUI(data?.session?.user||null);
-  }).catch(e=>console.warn('Auth init error:', e));
-  db.auth.onAuthStateChange((_event,session)=>updateUserUI(session?.user||null));
-}else{
-  console.warn('Supabase client is not available. Check the Supabase URL/key and the CDN script.');
-}
-
-/* ================= ADMIN ================= */
-function adminRememberKey(){
-  const user=getCurrentUser();
-  return user ? 'vareniki_admin_' + user.id : null;
-}
-function rememberAdminForCurrentUser(){
-  const key=adminRememberKey();
-  if(key) localStorage.setItem(key,'1');
-}
-function isAdminRemembered(){
-  const key=adminRememberKey();
-  return !!(key && localStorage.getItem(key)==='1');
-}
-function enableAdmin(showMessage=true){
-  isAdmin = true;
-  closeLogin();
-  document.getElementById('adminLoginBtn').textContent = 'Админка · Выйти';
-  document.getElementById('adminLoginBtn').classList.add('is-admin');
-  document.getElementById('adminBar').classList.add('show');
-  renderAll();
-  if(showMessage) showToast('Режим администратора включён');
-}
-function tryAutoAdmin(){
-  // Админ-режим никогда не включается автоматически. Его включает только кнопка «Админка».
-}
+/* ================= USER AUTH DISABLED ================= */
+function getCurrentUser(){ return null; }
 function openLogin(){
   if(isAdmin) return;
   if(getCurrentUser() && isAdminRemembered()){
@@ -1561,8 +1539,6 @@ function updatePlayerFields(){
 function validPlayerEntry(value){return String(value||'').trim().length>=2;}
 function regNext(step){
   if(step===1){
-    const user=getCurrentUser();
-    if(!user){showToast('Сначала войдите или создайте аккаунт');openUserLogin();return;}
     const teamName=document.getElementById('regTeamName').value.trim();
     const tg=document.getElementById('regTg').value.trim();
     const count=Math.max(3,Math.min(5,parseInt(document.getElementById('regPlayersCount').value,10)||3));
@@ -1571,14 +1547,15 @@ function regNext(step){
     if(entries.length!==count||entries.some(x=>!validPlayerEntry(x))){showToast('Заполните данные всех игроков');return;}
     const captain=entries[0];
     const captainTag=(captain.match(/#[A-Za-z0-9]{3,15}/)||[''])[0];
-    regData={team_name:teamName,tg,players_count:count,players:entries.map((value,i)=>({nick:value,avatar:'',screenshot:'',about:''})),tag:captainTag,userId:user.id,email:user.email||''};
+    const currentTournament=regData&&regData.tournament_id?{tournament_id:regData.tournament_id,tournament_name:regData.tournament_name}:{}; regData={...currentTournament,team_name:teamName,tg,players_count:count,players:entries.map((value,i)=>({nick:value,avatar:'',screenshot:'',about:''})),tag:captainTag,email:''};
     document.getElementById('rvTeamName').textContent=teamName;
     document.getElementById('rvTg').textContent=tg;
     document.getElementById('rvPlayersCount').textContent=count;
     document.getElementById('rvPlayers').innerHTML=regData.players.map((p,i)=>`<div style="padding:7px 0;border-bottom:1px solid var(--line);font-size:13px;"><b style="color:var(--gold);">${i===0?'Капитан':'Игрок '+(i+1)}</b> — ${escapeHtml(p.nick)}</div>`).join('');
-    document.getElementById('rvGoogle').textContent=user.email?`${getAuthProviderLabel(user)} ✓`:'Аккаунт подключён ✓';
+    document.getElementById('rvTeamName2').textContent=teamName;
+    document.getElementById('rvTg2').textContent=tg;
+    document.getElementById('rvPlayersCount2').textContent=count;
   }
-  if(step===2&&!getCurrentUser()){showToast('Войдите в аккаунт');openUserLogin();return;}
   setStep(step+1);
 }
 function regBack(step){setStep(step-1);}
@@ -1588,6 +1565,7 @@ function buildTelegramApplicationUrl(item){
   const text=[
     '🥟 VARENIKI E-SPORT — ЗАЯВКА',
     '',
+    'Турнир: '+(item.tournament_name||'Основной турнир'),
     'Команда: '+item.team_name,
     'Telegram капитана: '+item.tg,
     'Игроков: '+item.players_count,
@@ -1627,39 +1605,39 @@ async function notifyTelegram(item){
 }
 
 async function submitReg(){
-  const user=getCurrentUser();
-  if(!user){showToast('Сначала войдите в аккаунт');openUserLogin();return;}
   if(!regData.team_name||!Array.isArray(regData.players)||regData.players.length<3){showToast('Заполните данные заявки');setStep(1);return;}
   const id='VR-'+crypto.randomUUID().slice(0,8).toUpperCase();
-  const players=regData.players.map(p=>String(p.nick||'').trim());
-  const count=Number(regData.players_count);
   const item={
-    id, email:user.email||'',
-    nick:players[0]||'',
+    id,email:'',
+    nick:regData.team_name,
     tag:regData.tag||'',
     tg:regData.tg,
-    google:false, ts:Date.now(),
+    google:false,ts:Date.now(),
     team_name:regData.team_name,
-    teammates_count:Math.max(0,count-3),
-    teammate_tag:players[1]||null,
-    teammate_tag2:players[2]||null,
-    teammate_tag3:players[3]||null,
-    teammate_tag4:players[4]||null,
-    players_count:count,
-    players:regData.players
+    players_count:Number(regData.players_count),
+    players:regData.players,
+    tournament_id:regData.tournament_id||'',
+    tournament_name:regData.tournament_name||''
   };
   try{
     if(!CLOUD_ENABLED) throw new Error('Supabase не подключён');
-    // Пишем только в реальные колонки твоей таблицы registrations.
-    const dbItem={
-      id:item.id, email:item.email, nick:item.nick, tag:item.tag, tg:item.tg, google:false, ts:item.ts,
-      team_name:item.team_name, teammates_count:item.teammates_count,
-      teammate_tag:item.teammate_tag, teammate_tag2:item.teammate_tag2,
-      teammate_tag3:item.teammate_tag3, teammate_tag4:item.teammate_tag4,
-      players_count:item.players_count
-    };
+    // Храним расширенную заявку внутри nick, поэтому старую таблицу registrations менять не нужно.
+    const dbItem={id:item.id,email:item.email,nick:JSON.stringify({team_name:item.team_name,players_count:item.players_count,players:item.players,tournament_id:item.tournament_id||'',tournament_name:item.tournament_name||''}),tag:item.tag,tg:item.tg,google:false,ts:item.ts,team_name:item.team_name,teammates_count:Math.max(0,Number(item.players_count)-3),teammate_tag:item.players[1]?.nick||null,teammate_tag2:item.players[2]?.nick||null,players_count:Number(item.players_count),teammate_tag3:item.players[3]?.nick||null,teammate_tag4:item.players[4]?.nick||null};
     let {error}=await db.from('registrations').insert(dbItem);
     if(error) throw error;
+    ensureApplications();
+    content.tournaments.applications.unshift({
+      id:item.id,
+      tournament_id:item.tournament_id||'',
+      tournament_name:item.tournament_name||'Турнир',
+      team_name:item.team_name,
+      tg:item.tg,
+      players:item.players,
+      players_count:item.players_count,
+      status:'pending',
+      created_at:item.ts
+    });
+    await saveContent();
     registrations.unshift({...item,nick:item.team_name});
     document.getElementById('successId').textContent='#'+id;
     document.getElementById('telegramApplicationBtn').href=buildTelegramApplicationUrl(item);
@@ -1701,6 +1679,112 @@ if(location.protocol === 'file:'){
   console.warn('Vareniki site opened as a local file. Supabase email confirmation cannot reliably return to file://. Upload the HTML to a web host for full auth/Telegram functionality.');
 }
 setInterval(refreshCloud, 10000);
+
+/* ================= TOURNAMENT SYSTEM ================= */
+(function(){
+  const TOUR_KEY='tournamentsData';
+  function ensureTournamentData(){
+    content.tournaments=content.tournaments&&typeof content.tournaments==='object'?content.tournaments:{};
+    content.tournaments.settings=content.tournaments.settings&&typeof content.tournaments.settings==='object'?content.tournaments.settings:{};
+    content.tournaments.posts=Array.isArray(content.tournaments.posts)?content.tournaments.posts:[];
+    content.tournaments.applications=Array.isArray(content.tournaments.applications)?content.tournaments.applications:[];
+    const s=content.tournaments.settings;
+    if(!s.id)s.id='cup-1';
+    if(!s.title)s.title='Vareniki Cup #1';
+    if(!Number.isInteger(Number(s.teamCount))||Number(s.teamCount)<8||Number(s.teamCount)>64)s.teamCount=8;
+    if(!Array.isArray(s.teams)||s.teams.length!==Number(s.teamCount)) s.teams=Array.from({length:Number(s.teamCount)},(_,i)=>s.teams?.[i]||'');
+    if(typeof s.open!=='boolean')s.open=true;
+    return content.tournaments;
+  }
+  function linkifyText(s){
+    let safe=escapeHtml(String(s||''));
+    safe=safe.replace(/(https?:\/\/[^\s<]+)/g,'<a class="tour-post-link" href="$1" target="_blank" rel="noopener">🔗 $1</a>');
+    return safe.replace(/\n/g,'<br>');
+  }
+  function formatDate(ts){try{return new Date(ts).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}catch(e){return ''}}
+  window.openTournamentRegistration=function(id){
+    ensureTournamentData();
+    const s=content.tournaments.settings;
+    if(id && id!==s.id){const p=content.tournaments.posts.find(x=>x.id===id); if(p?.tournament_id){s.id=p.tournament_id;}}
+    regData={tournament_id:s.id,tournament_name:s.title};
+    const box=document.getElementById('selectedTournamentBox'); if(box)box.style.display='flex';
+    const name=document.getElementById('selectedTournamentName'); if(name)name.textContent=s.title;
+    goPage('register');
+  };
+  window.publishTournamentPost=async function(){
+    if(!isAdmin)return;
+    ensureTournamentData();
+    const title=document.getElementById('postTitleInput').value.trim();
+    const text=document.getElementById('postTextInput').value.trim();
+    const link=document.getElementById('postLinkInput').value.trim();
+    const image=document.getElementById('postImageInput').value.trim();
+    if(!title&&!text&&!image){showToast('Добавь хотя бы заголовок, текст или фото');return;}
+    content.tournaments.posts.unshift({id:'post-'+Date.now(),title,text,link,image,created_at:Date.now(),tournament_id:content.tournaments.settings.id,tournament_name:content.tournaments.settings.title});
+    await saveContent(); clearPostForm(); renderTournamentFeatures(); showToast('Пост опубликован для всех');
+  };
+  window.deleteTournamentPost=async function(id){
+    if(!isAdmin)return;
+    ensureTournamentData();
+    content.tournaments.posts=content.tournaments.posts.filter(p=>p.id!==id);
+    await saveContent(); renderTournamentFeatures(); showToast('Пост удалён');
+  };
+  window.clearPostForm=function(){['postTitleInput','postTextInput','postLinkInput','postImageInput'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});};
+  window.setTournamentOpen=async function(v){if(!isAdmin)return;ensureTournamentData();content.tournaments.settings.open=!!v;await saveContent();renderTournamentFeatures();};
+  window.saveTournamentSettings=async function(){
+    if(!isAdmin)return; ensureTournamentData(); const s=content.tournaments.settings;
+    const title=document.getElementById('tournamentTitleInput')?.value.trim(); const count=Number(document.getElementById('tournamentCountInput')?.value||8);
+    if(title)s.title=title; s.teamCount=Math.max(8,Math.min(64,count));
+    if(!Array.isArray(s.teams)||s.teams.length!==s.teamCount)s.teams=Array.from({length:s.teamCount},(_,i)=>s.teams?.[i]||'');
+    await saveContent(); renderTournamentFeatures(); renderBracket(); showToast('Настройки турнира сохранены');
+  };
+  window.saveBracketSettings=async function(){
+    if(!isAdmin)return; ensureTournamentData(); const s=content.tournaments.settings;
+    s.title=document.getElementById('bracketTitleInput').value.trim()||s.title;
+    const count=Math.max(8,Math.min(64,Number(document.getElementById('bracketCountInput').value)||8));
+    const old=Array.isArray(s.teams)?s.teams:[]; s.teamCount=count; s.teams=Array.from({length:count},(_,i)=>old[i]||document.getElementById('bracketTeam-'+i)?.value.trim()||'');
+    const inputs=Array.from(document.querySelectorAll('#bracketTeamInputs input')); inputs.forEach((el,i)=>{s.teams[i]=el.value.trim();});
+    await saveContent(); renderBracket(); renderTournamentFeatures(); showToast('Сетка сохранена для всех');
+  };
+  window.fillBracketDemo=function(){document.querySelectorAll('#bracketTeamInputs input').forEach(e=>e.value='');};
+  function roundNames(n){const rounds=Math.log2(n); return Array.from({length:rounds},(_,i)=>i===rounds-1?'Финал':'1/'+(n/Math.pow(2,i+1)));}
+  window.renderBracket=function(){
+    ensureTournamentData(); const s=content.tournaments.settings; const n=Number(s.teamCount)||8;
+    const hero=document.getElementById('bracketHero'); const pub=document.getElementById('bracketPublic'); const admin=document.getElementById('bracketAdmin');
+    if(!hero||!pub)return;
+    hero.innerHTML=`<div class="tournament-hero"><div><span class="tournament-status ${s.open?'':'off'}">${s.open?'● Регистрация открыта':'● Регистрация закрыта'}</span><h3>${escapeHtml(s.title)}</h3><p>${n} команд · текущая сетка турнира</p></div><button class="btn btn-primary" onclick="openTournamentRegistration('${escapeAttr(s.id)}')">Зарегистрироваться</button></div>`;
+    const teams=(s.teams||[]).map(x=>String(x||'').trim()); let current=teams.length===n?teams:Array.from({length:n},(_,i)=>teams[i]||'');
+    let rounds=[]; let round=current; let rnames=roundNames(n);
+    while(round.length>1){rounds.push(round); round=Array.from({length:round.length/2},(_,i)=>[round[i*2],round[i*2+1]]); round=round.map(pair=>pair.filter(Boolean).length===1?pair[0]:'');}
+    rounds.push(round);
+    pub.innerHTML='<div class="bracket"><div class="bracket-round"><h4>'+rnames[0]+'</h4><div class="bracket-matches">'+current.map((x,i)=>i%2===0?`<div class="bracket-match"><div class="bracket-team ${x?'':'tbd'}">${escapeHtml(x||'Ожидается')}<small>${i+1}</small></div><div class="bracket-team ${current[i+1]?'':'tbd'}">${escapeHtml(current[i+1]||'Ожидается')}<small>${i+2}</small></div></div>`:'').join('')+'</div></div>'+
+      rounds.slice(1).map((arr,ri)=>{let count=arr.length/2; return `<div class="bracket-round"><h4>${escapeHtml(rnames[ri+1]||('Раунд '+(ri+2)))}</h4><div class="bracket-matches">${Array.from({length:Math.max(1,count)},(_,i)=>{const a=arr[i*2]||'Победитель';const b=arr[i*2+1]||'Победитель';return `<div class="bracket-match"><div class="bracket-team ${a==='Победитель'?'tbd':''}">${escapeHtml(a)}<small>—</small></div><div class="bracket-team ${b==='Победитель'?'tbd':''}">${escapeHtml(b)}<small>—</small></div></div>`}).join('')}</div></div>`}).join('')+'</div>';
+    if(admin){admin.style.display=isAdmin?'block':'none'; if(isAdmin)populateBracketEditor();}
+  };
+  function populateBracketEditor(){
+    const s=content.tournaments.settings; const count=document.getElementById('bracketCountInput'); if(!count)return;
+    if(!count.options.length)for(let n=8;n<=64;n*=2){const o=document.createElement('option');o.value=n;o.textContent=n+' команд';count.appendChild(o);}
+    count.value=Number(s.teamCount)||8; document.getElementById('bracketTitleInput').value=s.title||'';
+    const holder=document.getElementById('bracketTeamInputs'); holder.innerHTML='';
+    (s.teams||[]).forEach((name,i)=>{const d=document.createElement('div');d.className='field';d.innerHTML=`<label>Команда ${i+1}</label><input id="bracketTeam-${i}" maxlength="60" value="${escapeAttr(name)}" placeholder="Название команды">`;holder.appendChild(d);});
+    count.onchange=()=>{const old=Array.from(document.querySelectorAll('#bracketTeamInputs input')).map(x=>x.value);const n=Number(count.value);holder.innerHTML='';for(let i=0;i<n;i++){const d=document.createElement('div');d.className='field';d.innerHTML=`<label>Команда ${i+1}</label><input id="bracketTeam-${i}" maxlength="60" value="${escapeAttr(old[i]||s.teams?.[i]||'')}" placeholder="Название команды">`;holder.appendChild(d);}};
+  }
+  window.renderTournamentFeatures=function(){
+    ensureTournamentData(); const s=content.tournaments.settings; const hero=document.getElementById('tournamentHero'); const posts=document.getElementById('tournamentPosts'); const admin=document.getElementById('tournamentAdminBox');
+    if(!hero||!posts)return;
+    hero.innerHTML=`<div class="tournament-hero"><div><span class="tournament-status ${s.open?'':'off'}">${s.open?'● Регистрация открыта':'● Регистрация закрыта'}</span><h3>${escapeHtml(s.title)}</h3><p>Турнирная лента, регистрация и актуальная сетка в одном месте.</p></div><button class="btn btn-primary" onclick="openTournamentRegistration('${escapeAttr(s.id)}')">Зарегистрироваться на турнир</button></div>`;
+    const arr=content.tournaments.posts||[];
+    posts.innerHTML=arr.length?arr.map(p=>`<article class="tour-post">${p.image?`<img class="tour-post-media" src="${escapeAttr(p.image)}" alt="" loading="lazy" onerror="this.style.display='none'">`:''}<div class="tour-post-body"><div class="tour-post-title">${escapeHtml(p.title||'Пост')}</div><div class="tour-post-text">${linkifyText(p.text||'')}</div>${p.link?`<a class="tour-post-link" href="${escapeAttr(p.link)}" target="_blank" rel="noopener">🔗 Открыть ссылку</a>`:''}<div class="tour-post-actions"><button class="btn btn-primary" onclick="openTournamentRegistration('${escapeAttr(p.tournament_id||s.id)}')">Зарегистрироваться на турнир</button><button class="btn btn-ghost" onclick="goPage('bracket')">Смотреть сетку</button></div><div class="tour-post-meta"><span>${escapeHtml(p.tournament_name||s.title)}</span><span>${formatDate(p.created_at)}</span></div></div></article>`).join(''):'<div class="empty-state"><div class="icon">📰</div><h3>Пока нет публикаций</h3><p>Администратор сможет публиковать новости, ссылки и фотографии прямо отсюда.</p></div>';
+    if(admin){admin.style.display=isAdmin?'block':'none'; if(isAdmin){document.getElementById('adminPostsList').innerHTML=arr.length?arr.map(p=>`<div class="admin-post-row"><span>${escapeHtml(p.title||'Пост')}</span><div class="admin-mini-actions"><button class="btn-danger" onclick="deleteTournamentPost('${escapeAttr(p.id)}')">Удалить</button></div></div>`).join(''):'<div class="bracket-note">Публикаций пока нет.</div>';}}
+    const ann=document.getElementById('announceEditorWrap'); if(ann)ann.style.display=isAdmin?'block':'none';
+  };
+  // Keep our feature renderer synced whenever the existing app rerenders.
+  const originalRenderAll=window.renderAll;
+  if(typeof originalRenderAll==='function') window.renderAll=function(){originalRenderAll();ensureTournamentData();renderTournamentFeatures();renderBracket();};
+  const originalGoPage=window.goPage;
+  // Existing goPage was patched above; keep functions safe if called before first render.
+  setTimeout(()=>{ensureTournamentData();renderTournamentFeatures();renderBracket();},120);
+})();
+
 </script>
 
 
