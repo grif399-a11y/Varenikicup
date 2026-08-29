@@ -920,7 +920,7 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
   <div class="modal" id="loginModalBox">
     <button class="modal-close" onclick="closeLogin()">✕</button>
     <h3>Вход для администратора</h3>
-    <p class="sub">Введите пароль, чтобы включить режим редактирования сайта.</p>
+    <p class="sub">Введите пароль, чтобы открыть админ-панель.</p>
     <div class="field">
       <label>Пароль</label>
       <input type="password" id="loginPass" maxlength="8" placeholder="••••">
@@ -1014,9 +1014,9 @@ function normalizeLeaderboard(list){
    Для общей базы данных вставьте сюда Supabase URL и anon key.
    SQL для базы приведён в комментарии внизу файла.
 */
-const SUPABASE_URL = 'https://dnvfsoycyrtxlbcllgrs.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_vSa0gUramulavgHkeJavPA_yD3RHOV-';
-const CLOUD_ENABLED = !!window.supabase && SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('PASTE_');
+const SUPABASE_URL = 'https://wavgpplxjdidmtidhobh.supabase.co';
+const SUPABASE_ANON_KEY = 'PASTE_NEW_SUPABASE_PUBLISHABLE_KEY_HERE';
+const CLOUD_ENABLED = !!window.supabase && SUPABASE_URL.startsWith('https://') && SUPABASE_ANON_KEY.startsWith('sb_publishable_');
 const db = CLOUD_ENABLED ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
 function localLoad(key, fallback){
@@ -1477,6 +1477,11 @@ function goContact(){
 /* ================= LOGIN / ADMIN ================= */
 /* ================= USER AUTH DISABLED ================= */
 function getCurrentUser(){ return null; }
+const ADMIN_PASSWORD = 'd5gqc21p';
+function adminRememberKey(){ return 'vareniki_admin_session'; }
+function rememberAdminForCurrentUser(){ localStorage.setItem(adminRememberKey(),'1'); }
+function isAdminRemembered(){ return localStorage.getItem(adminRememberKey())==='1'; }
+function tryAutoAdmin(){ /* вход в админку только по кнопке */ }
 function openLogin(){
   if(isAdmin) return;
   if(getCurrentUser() && isAdminRemembered()){
@@ -1490,9 +1495,11 @@ function openLogin(){
 function closeLogin(){ document.getElementById('loginModal').classList.remove('show'); }
 function tryLogin(){
   const val = document.getElementById('loginPass').value;
-  if(val === 'd5gqc21p'){
+  if(val === ADMIN_PASSWORD){
     rememberAdminForCurrentUser();
     enableAdmin(true);
+    closeLogin();
+    goPage('applications');
   } else {
     const box = document.getElementById('loginModalBox');
     box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
@@ -1622,7 +1629,7 @@ async function submitReg(){
   try{
     if(!CLOUD_ENABLED) throw new Error('Supabase не подключён');
     // Храним расширенную заявку внутри nick, поэтому старую таблицу registrations менять не нужно.
-    const dbItem={id:item.id,email:item.email,nick:JSON.stringify({team_name:item.team_name,players_count:item.players_count,players:item.players,tournament_id:item.tournament_id||'',tournament_name:item.tournament_name||''}),tag:item.tag,tg:item.tg,google:false,ts:item.ts,team_name:item.team_name,teammates_count:Math.max(0,Number(item.players_count)-3),teammate_tag:item.players[1]?.nick||null,teammate_tag2:item.players[2]?.nick||null,players_count:Number(item.players_count),teammate_tag3:item.players[3]?.nick||null,teammate_tag4:item.players[4]?.nick||null};
+    const dbItem={id:item.id,email:item.email,nick:JSON.stringify({team_name:item.team_name,players_count:item.players_count,players:item.players,tournament_id:item.tournament_id||'',tournament_name:item.tournament_name||''}),tag:item.tag,tg:item.tg,google:false,ts:item.ts,team_name:item.team_name,teammates_count:Math.max(0,Number(item.players_count)-3),teammate_tag1:item.players[1]?.nick||null,teammate_tag2:item.players[2]?.nick||null,players_count:Number(item.players_count),teammate_tag3:item.players[3]?.nick||null,teammate_tag4:item.players[4]?.nick||null};
     let {error}=await db.from('registrations').insert(dbItem);
     if(error) throw error;
     ensureApplications();
@@ -1644,7 +1651,7 @@ async function submitReg(){
     [1,2,3].forEach(i=>document.getElementById('regStep'+i).classList.remove('show'));
     document.getElementById('regSuccess').classList.add('show');
     renderApps();
-    showToast('Заявка подготовлена');
+    showToast('Заявка отправлена на проверку');
   }catch(e){
     console.error(e);
     showToast('Не удалось сохранить заявку: '+String(e?.message||e));
