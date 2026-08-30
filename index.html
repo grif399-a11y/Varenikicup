@@ -1063,7 +1063,7 @@ function renderParticipants(){
  const box=document.getElementById('participantsPublic');if(!box)return;
  const approved=registrations.filter(x=>x.status==='approved');
  box.innerHTML=approved.length?approved.map(a=>{
-  const players=getPlayers(a);return `<article class="participant-card application-approved"><div class="participant-head"><h3>${esc(a.team_name||a.nick||'Команда')}</h3><span class="participant-status">Подтверждено</span></div><div class="participant-meta">${esc(a.tournament_name||'Турнир')} · ${esc(a.tg||'')}</div><div class="participant-players">${players.map((p,i)=>`<div><b>${i===0?'Капитан':'Игрок '+(i+1)}:</b> ${esc(p.nick||p)}</div>`).join('')}</div></article>`;
+  const players=getPlayers(a);return `<article class="participant-card application-approved"><div class="participant-head"><h3>${esc(a.team_name||a.nick||'Команда')}</h3><span class="participant-status">Подтверждено</span></div><div class="participant-meta">${esc(a.tournament_name||'Турнир')} · ${esc(a.tg||'')}</div><div class="participant-players">${players.map((p,i)=>`<div><b>${i===0?'Капитан':'Игрок '+(i+1)}:</b> ${esc(p.nick||p)}</div>`).join('')}</div>${isAdmin?`<div class="app-actions"><button class="btn btn-danger" onclick="deleteApplication('${esc(a.id)}')">✕ Удалить участника</button></div>`:''}</article>`;
  }).join(''):'<div class="empty-state"><div class="icon">👥</div><h3>Пока нет подтверждённых участников</h3><p>После проверки заявок администрацией команды появятся здесь.</p></div>';
 }
 function getPlayers(a){
@@ -1175,5 +1175,108 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 window.addEventListener('beforeunload',()=>{});
 </script>
+
+<script id="tournament-toggle-system">
+(function(){
+  const TOGGLE_KEY = 'vareniki_tournament_enabled_v1';
+
+  function getTournamentEnabled(){
+    return localStorage.getItem(TOGGLE_KEY) !== '0';
+  }
+  function setTournamentEnabled(v){
+    localStorage.setItem(TOGGLE_KEY, v ? '1' : '0');
+    window.__tournamentEnabled = !!v;
+    applyTournamentState();
+  }
+
+  function findTextEl(text){
+    return Array.from(document.querySelectorAll('button,a,div,span,h1,h2,h3,label'))
+      .find(el => (el.textContent||'').trim() === text);
+  }
+
+  function applyTournamentState(){
+    const enabled = getTournamentEnabled();
+    window.__tournamentEnabled = enabled;
+
+    // Registration page/section
+    const regCandidates = [
+      document.getElementById('registerPage'),
+      document.getElementById('registrationPage'),
+      document.getElementById('registerSection'),
+      document.getElementById('registrationSection')
+    ].filter(Boolean);
+    regCandidates.forEach(el=>{
+      if(!enabled){
+        el.innerHTML = '<div style="padding:35px;text-align:center;border:1px solid var(--line);border-radius:16px;background:var(--card);"><div style="font-size:42px;margin-bottom:12px;">🏆</div><h2 style="margin:0 0 8px;">Турнира сейчас нет</h2><p style="color:var(--muted);margin:0;">Регистрация временно закрыта.</p></div>';
+      }
+    });
+
+    // Bracket page/section
+    const gridCandidates = [
+      document.getElementById('bracketPage'),
+      document.getElementById('gridPage'),
+      document.getElementById('bracketSection'),
+      document.getElementById('gridSection')
+    ].filter(Boolean);
+    gridCandidates.forEach(el=>{
+      if(!enabled){
+        el.innerHTML = '<div style="padding:35px;text-align:center;border:1px solid var(--line);border-radius:16px;background:var(--card);"><div style="font-size:42px;margin-bottom:12px;">🏆</div><h2 style="margin:0 0 8px;">Турнира сейчас нет</h2><p style="color:var(--muted);margin:0;">Сетка будет доступна, когда турнир будет включён.</p></div>';
+      }
+    });
+
+    // Disable common registration actions when tournament is off.
+    document.querySelectorAll('[data-action="register"], .register-btn, #registerBtn').forEach(btn=>{
+      btn.disabled = !enabled;
+      btn.style.opacity = enabled ? '' : '.55';
+      btn.style.pointerEvents = enabled ? '' : 'none';
+    });
+
+    const toggle = document.getElementById('adminTournamentToggle');
+    const status = document.getElementById('adminTournamentStatus');
+    if(toggle) toggle.checked = enabled;
+    if(status) status.textContent = enabled ? 'Турнир включён' : 'Турнира нет';
+  }
+
+  function addAdminControl(){
+    if(document.getElementById('adminTournamentControl')) return;
+
+    const adminBar = document.getElementById('adminBar');
+    if(!adminBar) return;
+
+    const wrap = document.createElement('div');
+    wrap.id = 'adminTournamentControl';
+    wrap.style.cssText = 'display:flex;align-items:center;gap:10px;margin:10px 0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);';
+    wrap.innerHTML = `
+      <strong style="font-size:13px;">Турнир</strong>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input id="adminTournamentToggle" type="checkbox" style="width:18px;height:18px;">
+        <span id="adminTournamentStatus" style="font-size:13px;color:var(--muted);"></span>
+      </label>
+    `;
+    adminBar.appendChild(wrap);
+
+    const input = wrap.querySelector('#adminTournamentToggle');
+    input.addEventListener('change', ()=>setTournamentEnabled(input.checked));
+    applyTournamentState();
+  }
+
+  // Keep the control available whenever the admin bar becomes visible.
+  const obs = new MutationObserver(()=> {
+    const bar=document.getElementById('adminBar');
+    if(bar && bar.classList.contains('show')) addAdminControl();
+  });
+  obs.observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['class']});
+
+  window.addEventListener('load', ()=>{
+    window.__tournamentEnabled = getTournamentEnabled();
+    addAdminControl();
+    applyTournamentState();
+  });
+
+  // Public helper for existing app code.
+  window.isTournamentEnabled = getTournamentEnabled;
+})();
+</script>
+
 </body>
 </html>
