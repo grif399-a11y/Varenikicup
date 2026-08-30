@@ -512,6 +512,12 @@ footer .fine{font-size:12px;color:var(--text-muted);font-weight:600;}
 </style>
   
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style id="bracket-five-collapse-style">
+.bracket-expand-wrap{display:flex;justify-content:center;margin:22px 0 8px;width:100%;}
+.bracket-expand-btn{min-width:240px;justify-content:center;}
+#bracketPublic .bracket-extra-team{display:none;}
+#bracketPublic.bracket-expanded .bracket-extra-team{display:block;}
+</style>
 </head>
 <body>
 
@@ -1103,11 +1109,22 @@ function renderBracket(){
  ensureTournament();const s=content.tournaments.settings,n=Number(s.teamCount)||8,hero=document.getElementById('bracketHero'),pub=document.getElementById('bracketPublic'),admin=document.getElementById('bracketAdmin');if(!hero||!pub)return;
  const names=Array.from({length:n},(_,i)=>s.teams[i]||'Ожидается');
  hero.innerHTML=`<div class="tournament-hero"><div><span class="tournament-status ${s.open?'':'off'}">${s.open?'● Регистрация открыта':'● Регистрация закрыта'}</span><h3>${esc(s.title)}</h3><p>${n} команд · текущая сетка турнира</p></div><button class="btn btn-primary" ${s.open?'':'disabled'} onclick="openTournamentRegistration('${esc(s.id)}')">Зарегистрироваться</button></div>`;
- const first=names.map((x,i)=>i%2===0?`<div class="bracket-match"><div class="bracket-team ${x==='Ожидается'?'tbd':''}">${esc(x)}<small>${i+1}</small></div><div class="bracket-team ${names[i+1]==='Ожидается'?'tbd':''}">${esc(names[i+1]||'Ожидается')}<small>${i+2}</small></div></div>`:'').join('');
+ const first=names.map((x,i)=>i%2===0?`<div class="bracket-match bracket-team-item ${i>=5?'bracket-extra-team':''}" data-bracket-index="${i}"><div class="bracket-team ${x==='Ожидается'?'tbd':''}">${esc(x)}<small>${i+1}</small></div><div class="bracket-team ${names[i+1]==='Ожидается'?'tbd':''}">${esc(names[i+1]||'Ожидается')}<small>${i+2}</small></div></div>`:'').join('');
  let cols=`<div class="bracket-round"><h4>1/${n}</h4><div class="bracket-matches">${first}</div></div>`;
- let count=n/2,round=2;while(count>=1){const matchCount=Math.max(1,count/2);cols+=`<div class="bracket-round"><h4>${count===1?'Финал':'1/'+count}</h4><div class="bracket-matches">${Array.from({length:matchCount},()=>`<div class="bracket-match"><div class="bracket-team tbd">Победитель<small>—</small></div><div class="bracket-team tbd">Победитель<small>—</small></div></div>`).join('')}</div></div>`;count/=2;round++}
- pub.innerHTML='<div class="bracket">'+cols+'</div>';
+ let count=n/2;while(count>=1){const matchCount=Math.max(1,count/2);cols+=`<div class="bracket-round"><h4>${count===1?'Финал':'1/'+count}</h4><div class="bracket-matches">${Array.from({length:matchCount},()=>`<div class="bracket-match"><div class="bracket-team tbd">Победитель<small>—</small></div><div class="bracket-team tbd">Победитель<small>—</small></div></div>`).join('')}</div></div>`;count/=2}
+ pub.innerHTML='<div class="bracket">'+cols+'</div>'+(n>5?`<div class="bracket-expand-wrap"><button type="button" class="btn btn-ghost bracket-expand-btn" onclick="toggleBracketTeams()" id="bracketExpandBtn">Показать остальные команды (${n-5})</button></div>`:'');
  if(admin){admin.style.display=isAdmin?'block':'none';if(isAdmin)populateBracketEditor();}
+ applyBracketTeamCollapse();
+}
+function applyBracketTeamCollapse(){
+ const items=Array.from(document.querySelectorAll('#bracketPublic .bracket-extra-team'));
+ const expanded=document.getElementById('bracketPublic')?.classList.contains('bracket-expanded');
+ items.forEach(el=>el.style.display=expanded?'':'none');
+ const btn=document.getElementById('bracketExpandBtn');
+ if(btn){const total=items.length;btn.textContent=expanded?'Скрыть команды':'Показать остальные команды ('+total+')';}
+}
+function toggleBracketTeams(){
+ const pub=document.getElementById('bracketPublic');if(!pub)return;pub.classList.toggle('bracket-expanded');applyBracketTeamCollapse();
 }
 function populateBracketEditor(){ensureTournament();const s=content.tournaments.settings,c=document.getElementById('bracketCountInput'),h=document.getElementById('bracketTeamInputs');if(!c||!h)return;if(!c.options.length)[8,16,32,64].forEach(n=>c.add(new Option(n+' команд',n)));c.value=s.teamCount;const ti=document.getElementById('bracketTitleInput');if(ti)ti.value=s.title;h.innerHTML=Array.from({length:s.teamCount},(_,i)=>`<div class="field"><label>Команда ${i+1}</label><input id="bracketTeam-${i}" maxlength="60" value="${esc(s.teams[i]||'')}" placeholder="Название команды"></div>`).join('');}
 async function saveBracketSettings(){if(!isAdmin)return;ensureTournament();const s=content.tournaments.settings;s.title=document.getElementById('bracketTitleInput').value.trim()||s.title;s.teamCount=Number(document.getElementById('bracketCountInput').value);s.teams=Array.from({length:s.teamCount},(_,i)=>document.getElementById('bracketTeam-'+i)?.value.trim()||'');await saveContent();renderBracket();renderTournament();toast('Сетка сохранена');}
@@ -1175,108 +1192,5 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 window.addEventListener('beforeunload',()=>{});
 </script>
-
-<script id="tournament-toggle-system">
-(function(){
-  const TOGGLE_KEY = 'vareniki_tournament_enabled_v1';
-
-  function getTournamentEnabled(){
-    return localStorage.getItem(TOGGLE_KEY) !== '0';
-  }
-  function setTournamentEnabled(v){
-    localStorage.setItem(TOGGLE_KEY, v ? '1' : '0');
-    window.__tournamentEnabled = !!v;
-    applyTournamentState();
-  }
-
-  function findTextEl(text){
-    return Array.from(document.querySelectorAll('button,a,div,span,h1,h2,h3,label'))
-      .find(el => (el.textContent||'').trim() === text);
-  }
-
-  function applyTournamentState(){
-    const enabled = getTournamentEnabled();
-    window.__tournamentEnabled = enabled;
-
-    // Registration page/section
-    const regCandidates = [
-      document.getElementById('registerPage'),
-      document.getElementById('registrationPage'),
-      document.getElementById('registerSection'),
-      document.getElementById('registrationSection')
-    ].filter(Boolean);
-    regCandidates.forEach(el=>{
-      if(!enabled){
-        el.innerHTML = '<div style="padding:35px;text-align:center;border:1px solid var(--line);border-radius:16px;background:var(--card);"><div style="font-size:42px;margin-bottom:12px;">🏆</div><h2 style="margin:0 0 8px;">Турнира сейчас нет</h2><p style="color:var(--muted);margin:0;">Регистрация временно закрыта.</p></div>';
-      }
-    });
-
-    // Bracket page/section
-    const gridCandidates = [
-      document.getElementById('bracketPage'),
-      document.getElementById('gridPage'),
-      document.getElementById('bracketSection'),
-      document.getElementById('gridSection')
-    ].filter(Boolean);
-    gridCandidates.forEach(el=>{
-      if(!enabled){
-        el.innerHTML = '<div style="padding:35px;text-align:center;border:1px solid var(--line);border-radius:16px;background:var(--card);"><div style="font-size:42px;margin-bottom:12px;">🏆</div><h2 style="margin:0 0 8px;">Турнира сейчас нет</h2><p style="color:var(--muted);margin:0;">Сетка будет доступна, когда турнир будет включён.</p></div>';
-      }
-    });
-
-    // Disable common registration actions when tournament is off.
-    document.querySelectorAll('[data-action="register"], .register-btn, #registerBtn').forEach(btn=>{
-      btn.disabled = !enabled;
-      btn.style.opacity = enabled ? '' : '.55';
-      btn.style.pointerEvents = enabled ? '' : 'none';
-    });
-
-    const toggle = document.getElementById('adminTournamentToggle');
-    const status = document.getElementById('adminTournamentStatus');
-    if(toggle) toggle.checked = enabled;
-    if(status) status.textContent = enabled ? 'Турнир включён' : 'Турнира нет';
-  }
-
-  function addAdminControl(){
-    if(document.getElementById('adminTournamentControl')) return;
-
-    const adminBar = document.getElementById('adminBar');
-    if(!adminBar) return;
-
-    const wrap = document.createElement('div');
-    wrap.id = 'adminTournamentControl';
-    wrap.style.cssText = 'display:flex;align-items:center;gap:10px;margin:10px 0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);';
-    wrap.innerHTML = `
-      <strong style="font-size:13px;">Турнир</strong>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-        <input id="adminTournamentToggle" type="checkbox" style="width:18px;height:18px;">
-        <span id="adminTournamentStatus" style="font-size:13px;color:var(--muted);"></span>
-      </label>
-    `;
-    adminBar.appendChild(wrap);
-
-    const input = wrap.querySelector('#adminTournamentToggle');
-    input.addEventListener('change', ()=>setTournamentEnabled(input.checked));
-    applyTournamentState();
-  }
-
-  // Keep the control available whenever the admin bar becomes visible.
-  const obs = new MutationObserver(()=> {
-    const bar=document.getElementById('adminBar');
-    if(bar && bar.classList.contains('show')) addAdminControl();
-  });
-  obs.observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['class']});
-
-  window.addEventListener('load', ()=>{
-    window.__tournamentEnabled = getTournamentEnabled();
-    addAdminControl();
-    applyTournamentState();
-  });
-
-  // Public helper for existing app code.
-  window.isTournamentEnabled = getTournamentEnabled;
-})();
-</script>
-
 </body>
 </html>
