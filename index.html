@@ -76,7 +76,9 @@ header{
   display:flex;align-items:center;gap:7px;transition:.2s;
 }
 .btn-login:hover{border-color:var(--blue-bright);color:var(--blue-bright);}
-.btn-login.admin-entry{border-color:var(--gold);color:var(--gold);background:rgba(245,185,66,0.05);}\n.btn-login.admin-entry:hover{background:rgba(245,185,66,0.12);}\n.btn-login.is-admin{border-color:var(--gold);color:var(--gold);background:rgba(245,185,66,0.08);}
+.btn-login.admin-entry{border-color:var(--gold);color:var(--gold);background:rgba(245,185,66,0.05);}
+.btn-login.admin-entry:hover{background:rgba(245,185,66,0.12);}
+.btn-login.is-admin{border-color:var(--gold);color:var(--gold);background:rgba(245,185,66,0.08);}
 .btn-login .dot{width:6px;height:6px;border-radius:50%;background:var(--good);box-shadow:0 0 8px var(--good);}
 
 .burger{
@@ -1579,7 +1581,7 @@ function logoutAdmin(){
   renderAll();
   showToast('Режим администратора выключен');
 }
-document.getElementById('loginPass').addEventListener('keydown', e=>{ if(e.key==='Enter') tryLogin(); });
+document.getElementById('loginPass')?.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); tryLogin(); } });
 
 document.querySelectorAll('[data-editable="true"]').forEach(el=>{
   el.addEventListener('blur', ()=>{
@@ -1589,10 +1591,10 @@ document.querySelectorAll('[data-editable="true"]').forEach(el=>{
     saveContent();
   });
 });
-document.getElementById('announceEditor').addEventListener('input', (e)=>{
+document.getElementById('announceEditor')?.addEventListener('input', (e)=>{
   content.announcement = e.target.value;
 });
-document.getElementById('announceEditor').addEventListener('blur', ()=>{
+document.getElementById('announceEditor')?.addEventListener('blur', ()=>{
   saveContent();
   renderAnnouncement();
 });
@@ -2042,5 +2044,30 @@ window.toggleTournamentOpenAdmin=async function(){
   }
 })();
 </script>
+
+<script id="vareniki-safe-start">
+(function(){
+  function safeStart(){
+    try{
+      if(typeof ensureTournamentData === 'function') ensureTournamentData();
+      if(typeof renderAll === 'function') renderAll();
+      if(typeof updatePlayerFields === 'function') updatePlayerFields();
+    }catch(e){
+      console.warn('Vareniki safe start:', e);
+      try{
+        document.querySelectorAll('.page').forEach((p,i)=>{
+          p.style.display = i===0 ? '' : 'none';
+        });
+      }catch(_){}
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', safeStart, {once:true});
+  }else{
+    setTimeout(safeStart, 0);
+  }
+})();
+</script>
+
 </body>
 </html>
